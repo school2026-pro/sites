@@ -26,13 +26,13 @@ function home() {
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-colors" aria-hidden="true"><span></span><span></span><span></span></div>
       <div class="hero-content"><span class="eyebrow">岡山大学附属中学校 / 生徒による探究企画</span><h1 id="hero-title">知ると、<br>学校はもっと楽しい。</h1><p>先生のこと。部活のこと。<br class="mobile-only">先輩たちの本音から。</p><a class="button" href="#teachers">先生図鑑・ランキングを見る ${arrow}</a><a class="hero-sub-link" href="#home-activities">部活・委員会の診断はこちら ↓</a></div>
-      <img class="campus" src="assets/campus.svg" width="1440" height="260" alt="校舎や本、運動場を描いた学校生活のイメージイラスト">
+      <div class="campus-explorer"><img class="campus" src="assets/campus.svg" width="1440" height="260" alt="校舎や本、運動場を描いた学校生活のイメージイラスト"><nav class="campus-links" aria-label="イラストから学校を探検"><a href="#clubs" class="campus-club"><span aria-hidden="true">＋</span>部活をのぞく</a><a href="#teachers" class="campus-teacher"><span aria-hidden="true">＋</span>先生を知る</a><a href="#committees" class="campus-committee"><span aria-hidden="true">＋</span>委員会を探す</a></nav></div>
     </section>
     <div class="status-note content-width"><span class="status-dot" aria-hidden="true"></span><p>ただいまアンケート集計準備中。先生の紹介や生徒の声は、確認した内容から順次掲載します。</p></div>
     <section class="teacher-feature content-width" aria-labelledby="teacher-feature-title">
       <div class="section-label"><span>01</span>このサイトの、いちばんの見どころ</div>
       <div class="teacher-feature-body"><div class="teacher-feature-copy"><span class="eyebrow">TEACHERS / 先生を知る</span><h2 id="teacher-feature-title">あの先生の、<br>知らなかった一面。</h2><p>いつもの授業の、ちょっと先へ。<br>先生の個性も、授業を楽しむコツも。<br>図鑑と5つのランキングから見つけよう。</p><div class="feature-actions"><a class="button" href="#teachers">先生図鑑をひらく ${arrow}</a><a class="text-link" href="#teachers/rankings">ランキングから探す ${arrow}</a></div></div>
-      <div class="teacher-feature-visual"><div class="feature-book" aria-hidden="true"><div class="book-heading">先生の魅力、<br><strong>5つの見方。</strong></div>${icon('book')}<span class="book-bottom">ひとつの順位では、語れない。</span></div><div class="axis-links" aria-label="ランキングの項目から探す">${chipLinks()}</div></div></div>
+      <div class="teacher-feature-visual"><div class="discovery-book"><button type="button" class="feature-book" id="discover-teacher" aria-expanded="false" aria-controls="teacher-discovery"><span class="book-heading">先生の魅力、<br><strong>5つの見方。</strong></span>${icon('book')}<span class="book-bottom">押して、ひとつめくる ↻</span></button><div class="teacher-discovery" id="teacher-discovery" aria-live="polite" hidden></div></div><div class="axis-links" aria-label="ランキングの項目から探す">${chipLinks()}</div></div></div>
     </section>
     <section class="activities-section content-width" id="home-activities" aria-labelledby="activities-title"><div class="section-heading"><span class="eyebrow">FIND YOUR PLACE</span><h2 id="activities-title">あなたに合う活動を、<br class="mobile-only">見つけよう。</h2><p>一覧からじっくり探す？ 診断から出会ってみる？</p></div>
       <div class="activity-pair">${activityEntry('clubs')}${activityEntry('committees')}</div>
@@ -79,8 +79,9 @@ function activityList(type) {
     const category = document.querySelector('#category')?.value;
     const rows = items.filter(x => x.name.toLowerCase().includes(query) && (!category || category==='すべて' || x.category===category));
     document.querySelector('#activity-count').textContent = `${rows.length}件`;
-    document.querySelector('#activity-items').innerHTML = rows.length ? `<div class="directory-grid">${rows.map((x,i)=>`<button type="button" class="activity-card" data-detail="${esc(x.id)}"><span class="activity-card-number" aria-hidden="true">${String(i+1).padStart(2,'0')}</span><span class="category-label">${esc(x.category || '委員会')}</span><h3>${esc(x.name)}</h3><p>${esc(x.summary || '活動内容・先輩の声は集計準備中です。')}</p><span class="card-link">詳しく見る ${arrow}</span></button>`).join('')}</div>` : empty('該当する活動がありません。','検索条件を変えてお試しください。',club?'ball':'clipboard');
+    document.querySelector('#activity-items').innerHTML = rows.length ? `<div class="directory-grid">${rows.map((x,i)=>`<article class="activity-card"><span class="activity-card-number" aria-hidden="true">${String(i+1).padStart(2,'0')}</span><span class="category-label">${esc(x.category || '委員会')}</span><h3>${esc(x.name)}</h3><p>${esc(x.summary || '活動内容・先輩の声は集計準備中です。')}</p><div class="activity-card-actions"><button type="button" class="text-link" data-detail="${esc(x.id)}" aria-label="${esc(x.name)}の詳しい紹介">詳しく見る ${arrow}</button>${GuidePlay.saveButton(x.id)}</div></article>`).join('')}</div>` : empty('該当する活動がありません。','検索条件を変えてお試しください。',club?'ball':'clipboard');
     bindDetails(items);
+    GuidePlay.enhance();
   };
   document.querySelector('#activity-search').addEventListener('input',update);
   document.querySelector('#category')?.addEventListener('change',update);
@@ -98,7 +99,9 @@ function showDetail(item,teacher=false) {
   focusAfterDialog = document.activeElement;
   const votes = teacher ? `<section class="detail-section"><h3>5つの項目で見る</h3><div class="detail-votes">${Object.entries(axes).map(([key,label])=>`<div><span>${label}</span><strong>${Number.isFinite(item.votes?.[key])?`${item.votes[key]}票`:'集計準備中'}</strong></div>`).join('')}</div><p class="small">アンケートで選ばれた票数です。能力の点数ではありません。</p></section>` : '';
   document.querySelector('#detail-body').innerHTML = `<span class="eyebrow">${teacher?'TEACHERS':item.category?'CLUBS':'COMMITTEES'}</span><h2 id="detail-title">${esc(item.name)}</h2><p class="detail-category">${esc(item.subject || item.category || '委員会')}</p><section class="detail-section"><h3>${teacher?'授業の特徴':'活動内容'}</h3><p>${esc(item.summary || 'アンケート集計後に掲載します。')}</p></section>${teacher?`<section class="detail-section"><h3>授業を楽しむコツ</h3><p>${esc(item.tips || '先輩の声を集めています。')}</p></section>`:`<section class="detail-section"><h3>活動頻度・雰囲気</h3><p>${esc(item.frequency || '集計準備中です。')}</p>${item.atmosphere?.length?`<div class="tag-list">${item.atmosphere.map(x=>`<span>${esc(x)}</span>`).join('')}</div>`:''}</section>`}${votes}<section class="detail-section"><h3>先輩の声</h3>${item.voices?.length?item.voices.map(text=>`<blockquote>${esc(text)}</blockquote>`).join(''):'<p>確認した内容から、順次紹介します。</p>'}</section>`;
+  if(!teacher)document.querySelector('#detail-body').insertAdjacentHTML('beforeend',`<div class="detail-save">${GuidePlay.saveButton(item.id)}<a class="text-link" href="#saved">気になるリストで見比べる →</a></div>`);
   dialog.showModal();
+  GuidePlay.enhance();
 }
 
 function quizPage(type) {
@@ -117,14 +120,14 @@ function drawQuiz(focus=false) {
     const all = window.scoreGuideQuiz(type,answers,D[type]);
     const cutoff = all.length ? all[Math.min(2,all.length-1)].score : 0;
     const candidates = all.filter(x=>x.score>=cutoff); // 同点の候補も省略しない
-    stage.innerHTML = `<div class="quiz-result-heading">${icon('leaf')}<span class="eyebrow">YOUR NEXT DISCOVERY</span><h2 id="quiz-question" tabindex="-1">${candidates.length?'こんな活動も、気になるかも。':'まずは、一覧からのぞいてみよう。'}</h2><p>${candidates.length?'あなたが選んだ興味に重なる活動分野から、候補を紹介します。':'興味がまだ決まっていなくても大丈夫。いろいろな活動を見比べてみよう。'}</p></div>${candidates.length?`<div class="quiz-result-list">${candidates.map(({item,reason})=>`<article><span class="category-label">${esc(item.category || (type==='committees'?'委員会':'部活動'))}</span><h3>${esc(item.name)}</h3><p>${esc(reason)}</p><button class="text-link" type="button" data-detail="${esc(item.id)}">活動の紹介を見る ${arrow}</button></article>`).join('')}</div><p class="small">興味の重なりが多い候補を紹介しています。同じ重なり方の候補は一緒に表示します。</p>`:''}<div class="quiz-result-actions"><a class="button" href="#${type}">すべての${type==='clubs'?'部活':'委員会'}を見る ${arrow}</a><button class="button button-outline" id="quiz-restart" type="button">もう一度診断する ↻</button><button class="text-link" id="quiz-review" type="button">回答を見直す</button></div>`;
+    stage.innerHTML = `<div class="quiz-result-heading">${icon('leaf')}<span class="eyebrow">YOUR NEXT DISCOVERY</span><h2 id="quiz-question" tabindex="-1">${candidates.length?'こんな活動も、気になるかも。':'まずは、一覧からのぞいてみよう。'}</h2><p>${candidates.length?'あなたが選んだ興味に重なる活動分野から、候補を紹介します。':'興味がまだ決まっていなくても大丈夫。いろいろな活動を見比べてみよう。'}</p></div>${candidates.length?`<div class="quiz-result-list">${candidates.map(({item,reason})=>`<article><span class="category-label">${esc(item.category || (type==='committees'?'委員会':'部活動'))}</span><h3>${esc(item.name)}</h3><p>${esc(reason)}</p><div class="result-save-row"><button class="text-link" type="button" data-detail="${esc(item.id)}">活動の紹介を見る ${arrow}</button>${GuidePlay.saveButton(item.id)}</div></article>`).join('')}</div><p class="small">興味の重なりが多い候補を紹介しています。同じ重なり方の候補は一緒に表示します。</p>`:''}<div class="quiz-result-actions"><a class="button" href="#${type}">すべての${type==='clubs'?'部活':'委員会'}を見る ${arrow}</a><button class="button button-outline" id="quiz-restart" type="button">もう一度診断する ↻</button><button class="text-link" id="quiz-review" type="button">回答を見直す</button></div>`;
     bindDetails(D[type]);
     document.querySelector('#quiz-restart').onclick = () => { currentQuiz={type,step:0,answers:[],result:false};drawQuiz(true); };
     document.querySelector('#quiz-review').onclick = () => {currentQuiz.result=false;currentQuiz.step=0;drawQuiz(true);};
   } else {
     const question = quiz.questions[step];
     const selected = answers[step];
-    stage.innerHTML = `<div class="quiz-progress-label"><span>QUESTION <strong>${String(step+1).padStart(2,'0')}</strong></span><span>${step+1} / ${quiz.questions.length}</span></div><progress max="${quiz.questions.length}" value="${step+1}" aria-label="診断の進み具合"></progress><h2 id="quiz-question" tabindex="-1">${esc(question.text)}</h2><p class="quiz-hint">いちばん近いものを、ひとつ選んでね。</p><div class="quiz-options" role="group" aria-labelledby="quiz-question">${question.options.map((option,index)=>`<button type="button" class="quiz-option" data-answer="${index}" aria-pressed="${selected===index}"><span class="option-dot" aria-hidden="true">${selected===index?'✓':''}</span>${esc(option.label)}</button>`).join('')}</div><div class="quiz-controls"><button class="text-link" id="quiz-prev" type="button" ${step===0?'disabled':''}>← ひとつ戻る</button><button class="button" id="quiz-next" type="button" ${selected===undefined?'disabled':''}>${step===quiz.questions.length-1?'結果を見る':'次の質問へ'} ${arrow}</button></div>`;
+    stage.innerHTML = `<div class="quiz-progress-label"><span>QUESTION <strong>${String(step+1).padStart(2,'0')}</strong></span><span>${step+1} / ${quiz.questions.length}</span></div><div class="quiz-trail" aria-hidden="true">${quiz.questions.map((_,i)=>`<span class="${i<step?'done':i===step?'current':''}">${i<step?'✓':i+1}</span>`).join('')}</div><progress max="${quiz.questions.length}" value="${step+1}" aria-label="診断の進み具合"></progress><h2 id="quiz-question" tabindex="-1">${esc(question.text)}</h2><p class="quiz-hint">いちばん近いものを、ひとつ選んでね。</p><div class="quiz-options" role="group" aria-labelledby="quiz-question">${question.options.map((option,index)=>`<button type="button" class="quiz-option" data-answer="${index}" aria-pressed="${selected===index}"><span class="option-dot" aria-hidden="true">${selected===index?'✓':''}</span>${esc(option.label)}</button>`).join('')}</div><div class="quiz-controls"><button class="text-link" id="quiz-prev" type="button" ${step===0?'disabled':''}>← ひとつ戻る</button><button class="button" id="quiz-next" type="button" ${selected===undefined?'disabled':''}>${step===quiz.questions.length-1?'結果を見る':'次の質問へ'} ${arrow}</button></div>`;
     document.querySelectorAll('[data-answer]').forEach(button=>button.onclick=()=> {
       currentQuiz.answers[step]=Number(button.dataset.answer);
       document.querySelectorAll('[data-answer]').forEach(b=>{const active=b===button;b.setAttribute('aria-pressed',String(active));b.querySelector('.option-dot').textContent=active?'✓':'';});
@@ -133,6 +136,7 @@ function drawQuiz(focus=false) {
     document.querySelector('#quiz-next').onclick=()=>{if(currentQuiz.answers[step]===undefined)return;if(step===quiz.questions.length-1)currentQuiz.result=true;else currentQuiz.step++;drawQuiz(true);};
     document.querySelector('#quiz-prev').onclick=()=>{if(currentQuiz.step>0){currentQuiz.step--;drawQuiz(true);}};
   }
+  GuidePlay.enhance();
   if(focus){document.querySelector('#quiz-question').focus({preventScroll:true});stage.scrollIntoView({block:'start',behavior:'auto'});}
 }
 
@@ -161,7 +165,7 @@ function closeMenu(returnFocus=false) {
 function render() {
   let route = location.hash.slice(1) || 'home';
   if(route==='main'){main.focus();return;}
-  if(route==='home-activities'){if(document.body.dataset.page!=='home')home();document.body.dataset.page='home';closeMenu();document.querySelectorAll('[data-nav]').forEach(a=>a.removeAttribute('aria-current'));document.title='ホーム | スクールライフ完全攻略';if(dialog.open)dialog.close();document.querySelector('#home-activities')?.scrollIntoView();return;}
+  if(route==='home-activities'){if(document.body.dataset.page!=='home')home();document.body.dataset.page='home';closeMenu();document.querySelectorAll('[data-nav]').forEach(a=>a.removeAttribute('aria-current'));document.title='ホーム | スクールライフ完全攻略';if(dialog.open)dialog.close();GuidePlay.enhance();document.querySelector('#home-activities')?.scrollIntoView();return;}
   if(route==='rankings')route='teachers/rankings';
   const [page,mode,axis]=route.split('/');
   closeMenu();if(dialog.open)dialog.close();
@@ -172,9 +176,11 @@ function render() {
   else if(page==='clubs'||page==='committees'){if(mode==='quiz')quizPage(page);else activityList(page);}
   else if(page==='voices')voices();
   else if(page==='about')about();
+  else if(page==='saved'){main.innerHTML=GuidePlay.savedPage();}
   else home();
-  const titles={teachers:'先生図鑑・ランキング',clubs:mode==='quiz'?'部活診断':'部活動ガイド',committees:mode==='quiz'?'委員会診断':'委員会ガイド',voices:'学校生活の本音',about:'このサイトについて'};
+  const titles={teachers:'先生図鑑・ランキング',clubs:mode==='quiz'?'部活診断':'部活動ガイド',committees:mode==='quiz'?'委員会診断':'委員会ガイド',voices:'学校生活の本音',saved:'気になるリスト',about:'このサイトについて'};
   document.title=`${titles[page]||'ホーム'} | スクールライフ完全攻略`;
+  GuidePlay.enhance();
   if(oldPage)main.focus({preventScroll:true});
   window.scrollTo({top:0,behavior:'auto'});
 }
@@ -183,7 +189,9 @@ document.querySelector('#menu-toggle').onclick=()=>{const open=document.querySel
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.querySelector('#mobile-menu').hidden)closeMenu(true);});
 document.querySelector('#mobile-menu').addEventListener('click',e=>{if(e.target.closest('a'))closeMenu();});
 document.querySelector('#close').onclick=()=>dialog.close();
+document.addEventListener('click',event=>{if(event.target.closest('.detail-save a'))dialog.close();});
 dialog.addEventListener('close',()=>{if(focusAfterDialog?.isConnected)focusAfterDialog.focus();focusAfterDialog=null;});
 dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();}});
+document.addEventListener('click',event=>{const button=event.target.closest('.saved-page [data-detail]');if(button){const item=[...D.clubs,...D.committees].find(x=>x.id===button.dataset.detail);if(item)showDetail(item);}});
 window.addEventListener('hashchange',render);
 render();
