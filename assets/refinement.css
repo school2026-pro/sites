@@ -1,0 +1,231 @@
+/* Readable, restrained refinement. Preserve the guide's mint / sky / cream identity. */
+:root { --muted:#53685f; --line:#d3e1d9; }
+body { font-size:18px; line-height:1.9; }
+.content-width { width:min(1280px,calc(100% - 112px)); }
+.site-header { max-width:1536px; margin:20px auto 0; width:calc(100% - 64px); padding:17px 28px; gap:24px; box-shadow:none; border-color:#d2e1da; }
+.brand > span { font-size:24px; letter-spacing:-.04em; }
+.brand small { font-size:13px; color:var(--muted); }
+.brand img { width:46px; height:40px; }
+.desktop-nav { gap:28px; }
+.desktop-nav a { font-size:17px; }
+.button { font-size:18px; min-height:60px; padding:15px 28px; }
+.text-link { font-size:18px; }
+.small,.eyebrow { font-size:15px; }
+.hero { margin-top:-106px; padding-top:106px; min-height:0; background:#eef7f1; }
+.hero-content { position:relative; z-index:2; padding:35px 24px 96px; }
+.hero-content .eyebrow { font-size:15px; font-weight:500; color:#425d51; letter-spacing:.04em; }
+.hero h1 { font-size:clamp(44px,4.65vw,68px); line-height:1.42; letter-spacing:.035em; margin:18px 0 18px; }
+.hero-content > p { font-size:22px; line-height:1.8; letter-spacing:.02em; margin-bottom:25px; }
+.hero-content .button { font-size:20px; min-width:430px; padding:17px 32px; gap:36px; }
+.hero-sub-link { font-size:16px; margin-top:15px; color:#3f6858; }
+.hero-sub-link span { margin-left:12px; }
+.hero-colors { background:#edf7f1; }
+.hero-colors span { width:150%; height:100%; }
+.hero-colors span:nth-child(1) { background:#e3f1f7; left:25%; top:48%; transform:rotate(-15deg); }
+.hero-colors span:nth-child(2) { background:#fbf9ed; top:88%; left:-45%; height:70%; transform:rotate(7deg); }
+.hero-colors span:nth-child(3) { display:none; }
+.campus-refined { position:absolute; z-index:1; width:min(43%,640px); height:auto; bottom:0; right:0; margin:0; opacity:.95; }
+.teacher-feature { margin-top:0; padding:42px 0 0; }
+.teacher-feature-body { grid-template-columns:.85fr 1.15fr; gap:50px; background:none; border-radius:0; padding:0; align-items:center; }
+.section-label { font-size:18px; color:var(--ink); margin-bottom:21px; gap:16px; }
+.section-label > span { font:500 19px/1.2 var(--body); padding:0 0 0 13px; border:0; border-left:4px solid var(--green); border-radius:0; color:var(--green); }
+.teacher-feature-copy h2 { font-size:clamp(30px,3.1vw,44px); line-height:1.5; margin:0 0 18px; letter-spacing:.025em; }
+.teacher-feature-copy > p { font-size:19px; line-height:1.9; color:var(--muted); margin-bottom:16px; }
+.teacher-feature-copy > .text-link { font-size:17px; }
+.teacher-feature-visual { display:block; padding:10px 0; }
+.open-book { position:relative; isolation:isolate; text-align:center; padding:44px 28px 36px; min-height:270px; }
+.open-book:before,.open-book:after { content:''; position:absolute; z-index:-1; top:0; bottom:0; width:50%; background:#fff; border:1px solid #81a99c; box-shadow:0 5px 0 -2px #fff,0 6px 0 -2px #91b1a5; }
+.open-book:before { left:0; border-radius:45% 8% 3% 3% / 7% 5% 4% 4%; transform:skewY(2deg); border-right:0; }
+.open-book:after { right:0; border-radius:8% 45% 3% 3% / 5% 7% 4% 4%; transform:skewY(-2deg); border-left:0; }
+.book-center { position:absolute; left:50%; top:16px; bottom:13px; border-left:1px solid #e1eae5; z-index:-1; }
+.open-book h3 { font-size:23px; line-height:1.6; margin:0 0 26px; font-family:var(--body); font-weight:600; }
+.axis-links { display:flex; flex-flow:row wrap; justify-content:center; gap:0; margin:0 0 24px; }
+.axis-links .axis-chip { border:0; border-right:1px solid #a9c7bc; border-radius:0; background:transparent; padding:3px 15px; font-size:18px; color:var(--ink); line-height:1.8; }
+.axis-links .axis-chip:last-child { border:0; }
+.axis-links .axis-chip > span { display:none; }
+.axis-links .axis-chip:hover { color:var(--green); text-decoration:underline; text-underline-offset:6px; }
+.open-book .text-link { border:0; font-size:17px; }
+.status-note { font-size:14px; justify-content:flex-start; margin:30px 0 0; padding:19px 0; border-top:1px solid var(--line); border-bottom:0; }
+.activities-section { position:relative; margin-top:52px; padding:55px 0 65px; background:#eef6f8; }
+.activities-section:before { content:''; position:absolute; left:0; right:0; top:-26px; height:38px; background:#eef6f8; border-radius:60% 40% 0 0 / 100% 100% 0 0; }
+.section-heading { text-align:left; margin-bottom:32px; }
+.section-heading h2 { font-size:38px; margin:0 0 12px; }
+.section-heading p { font-size:19px; }
+.activity-pair { gap:30px; }
+.activity-entry { border:1px solid #cfdfdb; border-radius:18px; padding:32px; background:#fff; }
+.activity-entry.committee-theme { background:#fffef8; border-color:#e4dbc2; }
+.activity-entry-top { gap:25px; margin-bottom:26px; }
+.activity-entry h3 { font-size:30px; }
+.activity-entry p { font-size:17px; }
+.activity-entry-actions { flex-wrap:wrap; }
+.activity-entry-actions .button { font-size:16px; min-height:56px; flex:auto; }
+.activity-entry-actions .button:first-child { background:none; border-color:transparent; }
+.voices-feature { margin-block:64px 40px; gap:32px; }
+.voices-feature h2 { font-size:36px; }
+.voices-feature .section-label { margin-bottom:12px; }
+.voices-feature p { font-size:18px; }
+.about-link { font-size:17px; }
+.inner-page { padding-top:46px; }
+.page-heading h1 { font-size:46px; }
+.page-heading p { font-size:20px; }
+.hub-switch a { font-size:19px; min-height:64px; }
+.result-count { font-size:16px; }
+.search-field input,.select-field select { font-size:18px; }
+.select-field { font-size:16px; }
+.empty-state h3 { font-size:28px; }
+.empty-state p { font-size:18px; }
+.context-note p,.ranking-note { font-size:16px; }
+.activity-card h3,.teacher-card h3 { font-size:28px; }
+.activity-card p,.teacher-card p { font-size:17px; }
+.category-label,.card-link { font-size:15px; }
+.activity-card-actions .text-link { font-size:17px; }
+.save-toggle { font-size:15px; min-height:44px; }
+.activity-discovery .text-link,.surprise-button { font-size:16px; }
+.diagnosis-banner h2 { font-size:28px; }
+.diagnosis-banner p { font-size:17px; }
+.axis-tabs .axis-chip { font-size:18px; padding:10px 23px; }
+.ranking-intro p,.ranking-title { font-size:20px; }
+.quiz-stage h2 { font-size:30px; }
+.quiz-hint,.quiz-disclaimer { font-size:16px; }
+.quiz-option { font-size:19px; min-height:64px; }
+.quiz-controls .text-link { font-size:17px; }
+.quiz-result-list p,.quiz-result-heading p { font-size:18px; }
+.quiz-progress { font-size:16px; }
+.quiz-trail > span { width:32px; height:32px; font-size:14px; }
+.voice-tabs button { font-size:17px; }
+.voice-card p { font-size:20px; }
+.about-page > section p { font-size:18px; }
+.detail-section p,.detail-section blockquote { font-size:18px; }
+.detail-votes > div { font-size:17px; }
+.teacher-discovery p { font-size:16px; }
+.saved-dock { font-size:16px; }
+.compare-table caption,.compare-table td,.compare-table tr > th:first-child { font-size:16px; }
+.footer-inner p { font-size:16px; }
+.footer-links a { font-size:16px; }
+.footer-bottom { font-size:14px; }
+@media(min-width:1600px) { .hero-content { padding-bottom:115px; } }
+@media(max-width:1200px) {
+ .desktop-nav { display:none; } .menu-toggle { display:block; } .brand > span { font-size:23px; }
+ .site-header { padding:14px 24px; } .hero { margin-top:-100px; padding-top:100px; }
+ .hero-content { padding-top:34px; padding-bottom:90px; }
+ .teacher-feature-body { gap:30px; } .open-book { padding-inline:15px; }
+ .axis-links .axis-chip { padding-inline:11px; font-size:17px; }
+ .activity-entry-actions { flex-direction:column-reverse; }
+ .mobile-menu a { font-size:18px; padding:12px 0; }
+}
+@media(max-width:800px) {
+ .content-width { width:calc(100% - 48px); }
+ .teacher-feature-body { grid-template-columns:1fr; gap:20px; }
+ .teacher-feature-copy { position:relative; } .teacher-feature-copy h2 { font-size:38px; }
+ .teacher-feature-copy > p br { display:none; }
+ .teacher-feature-visual { margin:0; }
+ .open-book { max-width:640px; margin:0 auto; min-height:240px; padding:34px 20px 26px; }
+ .activity-pair { grid-template-columns:1fr; }
+ .activity-entry-actions { flex-direction:row; }
+ .voices-feature { flex-wrap:wrap; } .voices-feature > .button { margin-left:0; }
+}
+@media(max-width:640px) {
+ body { font-size:17px; } .content-width { width:calc(100% - 40px); }
+ .site-header { width:calc(100% - 24px); margin:12px 12px 0; padding:13px 16px; border-radius:38px; gap:9px; }
+ .brand { gap:9px; } .brand img { width:31px; height:32px; }
+ .brand > span { font-size:clamp(16px,4.4vw,22px); letter-spacing:-.06em; }
+ .brand small { display:none; } .menu-toggle { width:40px; height:40px; padding:10px; border-radius:50%; }
+ .mobile-menu { top:calc(100% + 8px); } .mobile-menu a { font-size:17px; }
+ .hero { margin-top:-80px; padding-top:80px; }
+ .hero-content { padding:35px 20px 115px; }
+ .hero-content .eyebrow { font-size:12px; line-height:1.8; letter-spacing:0; }
+ .school-separator { padding-inline:2px; }
+ .hero h1 { font-size:clamp(29px,7.8vw,48px); margin:22px 0 18px; line-height:1.55; letter-spacing:0; }
+ .hero-content > p { font-size:18px; line-height:1.9; margin-bottom:23px; }
+ .hero-content .button { min-width:0; width:100%; max-width:380px; padding:16px 17px; font-size:16px; gap:15px; min-height:60px; }
+ .hero-sub-link { font-size:15px; margin-top:17px; }
+ .campus-refined { width:310px; max-width:85%; margin:0; right:-8px; }
+ .hero-colors span:nth-child(1) { top:65%; left:-10%; width:180%; }
+ .hero-colors span:nth-child(2) { top:92%; width:180%; }
+ .teacher-feature { padding-top:32px; }
+ .section-label { font-size:16px; gap:12px; margin-bottom:18px; }
+ .section-label > span { font-size:17px; padding-left:10px; }
+ .teacher-feature-copy h2 { font-size:31px; line-height:1.6; margin-bottom:15px; }
+ .teacher-feature-copy > p { font-size:17px; line-height:1.9; }
+ .teacher-feature-copy > .text-link { font-size:17px; }
+ .teacher-feature-body { padding:0; gap:27px; }
+ .teacher-feature-visual { display:block; padding:0; }
+ .open-book { padding:29px 17px 25px; min-height:265px; }
+ .open-book h3 { font-size:20px; margin-bottom:20px; }
+ .axis-links { flex-direction:row; flex-wrap:wrap; gap:11px 0; margin-bottom:18px; }
+ .axis-links .axis-chip { font-size:16px; padding:2px 14px; line-height:1.7; }
+ .axis-links .axis-chip:nth-child(3) { border-right:0; }
+ .open-book .text-link { font-size:16px; }
+ .status-note { margin-top:26px; padding:17px 0; font-size:14px; line-height:1.9; }
+ .status-dot { width:7px; height:7px; margin-top:10px; }
+ .activities-section { margin-top:32px; padding:35px 0 42px; }
+ .section-heading { margin-bottom:26px; }
+ .section-heading h2 { font-size:29px; line-height:1.6; }
+ .section-heading p { font-size:17px; line-height:1.9; }
+ .activity-entry { padding:25px 21px; border-radius:15px; }
+ .activity-entry-top { gap:17px; margin-bottom:22px; }
+ .activity-entry-top > .line-icon { width:42px; height:42px; }
+ .activity-entry-top > div { padding-left:16px; }
+ .activity-entry h3 { font-size:26px; }
+ .activity-entry p { font-size:16px; line-height:1.9; }
+ .activity-entry-actions { flex-direction:column-reverse; gap:7px; }
+ .activity-entry-actions .button { font-size:16px; }
+ .voices-feature { margin:35px auto; gap:17px; padding:28px 0; }
+ .voice-decoration { width:44px; height:44px; }
+ .voice-decoration > .line-icon { width:29px; height:29px; }
+ .voices-feature > div:nth-child(2) { width:calc(100% - 61px); }
+ .voices-feature h2 { font-size:26px; } .voices-feature p { font-size:16px; }
+ .voices-feature > .button { width:100%; font-size:17px; margin:0; }
+ .about-link { font-size:16px; padding-bottom:32px; }
+ .inner-page { padding-top:24px; }
+ .page-heading h1 { font-size:31px; line-height:1.5; } .page-heading p { font-size:17px; }
+ .eyebrow,.small { font-size:14px; }
+ .hub-switch a { font-size:16px; min-height:58px; }
+ .search-field input,.select-field select { font-size:17px; }
+ .select-field { font-size:15px; }
+ .empty-state { padding:30px 22px; } .empty-state h3 { font-size:24px; } .empty-state p { font-size:16px; }
+ .context-note p,.ranking-note { font-size:14px; }
+ .activity-card,.teacher-card { padding:24px; }
+ .activity-card h3,.teacher-card h3 { font-size:25px; }
+ .activity-card p,.teacher-card p { font-size:16px; }
+ .category-label,.card-link { font-size:14px; }
+ .activity-card-actions .text-link { font-size:16px; }
+ .activity-discovery .text-link,.surprise-button { font-size:15px; }
+ .save-toggle { font-size:14px; min-height:44px; }
+ .diagnosis-banner h2 { font-size:23px; } .diagnosis-banner p { font-size:16px; }
+ .diagnosis-banner > .button { font-size:16px; }
+ .axis-tabs .axis-chip { font-size:16px; padding:10px 17px; }
+ .ranking-intro p { font-size:17px; } .ranking-title { font-size:22px; }
+ .ranking-row { gap:12px; } .rank-name strong { font-size:20px; } .rank-name small { font-size:14px; }
+ .quiz-stage { padding:26px 20px; } .quiz-stage h2 { font-size:25px; }
+ .quiz-hint,.quiz-disclaimer { font-size:15px; }
+ .quiz-option { font-size:17px; padding:16px 13px; min-height:62px; }
+ .quiz-controls .text-link { font-size:15px; } .quiz-controls .button { font-size:16px; }
+ .quiz-result-list p,.quiz-result-heading p { font-size:16px; }
+ .quiz-result-actions .button { font-size:16px; }
+ .quiz-trail > span { width:28px; height:28px; font-size:13px; }
+ .voice-tabs button { font-size:15px; } .voice-card p { font-size:18px; }
+ .about-page > section p { font-size:17px; }
+ .detail-section p,.detail-section blockquote { font-size:16px; } .detail-section h3 { font-size:22px; }
+ .detail-votes > div { font-size:15px; }
+ .saved-dock { font-size:15px; } .saved-return .button { font-size:16px; }
+ .footer-brand { font-size:22px; } .footer-inner p { font-size:15px; }
+ .footer-links { gap:16px; } .footer-links a { font-size:14px; } .footer-bottom { font-size:13px; }
+}
+@media(prefers-reduced-motion:no-preference) { .open-book .axis-chip:hover { transform:translateY(-2px); } }
+/* Review pass: let the feature enter the first desktop viewport. */
+@media(min-width:1201px) { .hero-content { padding-top:28px; padding-bottom:46px; } }
+@media(min-width:1600px) { .hero-content { padding-bottom:64px; } }
+.hero-cta-short { display:none !important; }
+.hero-content .button .hero-cta-long,.hero-content .button .hero-cta-short { font:inherit; line-height:1.7; transform:none; }
+@media(max-width:360px) {
+ .brand > span { font-size:15px; letter-spacing:-.06em; }
+ .brand img { width:24px; height:28px; } .brand { gap:6px; }
+ .site-header { padding:13px 12px; gap:7px; }
+ .hero-ending { display:block; }
+ .hero h1 { font-size:32px; line-height:1.5; }
+ .hero-content .button { gap:10px; padding-inline:13px; }
+ .hero-cta-long { display:none !important; } .hero-cta-short { display:inline !important; }
+ .teacher-feature-copy h2 { font-size:28px; }
+ .open-book h3 { font-size:18px; }
+}

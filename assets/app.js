@@ -25,19 +25,16 @@ function home() {
   main.innerHTML = `
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-colors" aria-hidden="true"><span></span><span></span><span></span></div>
-      <div class="hero-content"><span class="eyebrow">岡山大学附属中学校 / 生徒による探究企画</span><h1 id="hero-title">知ると、<br>学校はもっと楽しい。</h1><p>先生のこと。部活のこと。<br class="mobile-only">先輩たちの本音から。</p><a class="button" href="#teachers">先生図鑑・ランキングを見る ${arrow}</a><a class="hero-sub-link" href="#home-activities">部活・委員会の診断はこちら ↓</a></div>
-      <div class="campus-explorer"><img class="campus" src="assets/campus.svg" width="1440" height="260" alt="校舎や本、運動場を描いた学校生活のイメージイラスト"><nav class="campus-links" aria-label="イラストから学校を探検"><a href="#clubs" class="campus-club"><span aria-hidden="true">＋</span>部活をのぞく</a><a href="#teachers" class="campus-teacher"><span aria-hidden="true">＋</span>先生を知る</a><a href="#committees" class="campus-committee"><span aria-hidden="true">＋</span>委員会を探す</a></nav></div>
+      <div class="hero-content"><span class="eyebrow">岡山大学附属中学校<span class="school-separator">｜</span>生徒による探究企画</span><h1 id="hero-title">知ると、<br><span class="hero-second">学校はもっと<span class="hero-ending">楽しい。</span></span></h1><p>先生のこと。部活のこと。<br class="mobile-only">先輩たちの本音から。</p><a class="button" href="#teachers"><span class="hero-cta-long">先生図鑑・ランキングを見る</span><span class="hero-cta-short">先生図鑑・ランキングへ</span> ${arrow}</a><a class="hero-sub-link" href="#home-activities">部活・委員会の診断へ <span aria-hidden="true">↓</span></a></div>
+      <img class="campus campus-refined" src="assets/campus-refined.svg" width="640" height="230" alt="校舎と木々、本を描いた学校生活のイメージ">
     </section>
-    <div class="status-note content-width"><span class="status-dot" aria-hidden="true"></span><p>ただいまアンケート集計準備中。先生の紹介や生徒の声は、確認した内容から順次掲載します。</p></div>
     <section class="teacher-feature content-width" aria-labelledby="teacher-feature-title">
-      <div class="section-label"><span>01</span>このサイトの、いちばんの見どころ</div>
-      <div class="teacher-feature-body"><div class="teacher-feature-copy"><span class="eyebrow">TEACHERS / 先生を知る</span><h2 id="teacher-feature-title">あの先生の、<br>知らなかった一面。</h2><p>いつもの授業の、ちょっと先へ。<br>先生の個性も、授業を楽しむコツも。<br>図鑑と5つのランキングから見つけよう。</p><div class="feature-actions"><a class="button" href="#teachers">先生図鑑をひらく ${arrow}</a><a class="text-link" href="#teachers/rankings">ランキングから探す ${arrow}</a></div></div>
-      <div class="teacher-feature-visual"><div class="discovery-book"><button type="button" class="feature-book" id="discover-teacher" aria-expanded="false" aria-controls="teacher-discovery"><span class="book-heading">先生の魅力、<br><strong>5つの見方。</strong></span>${icon('book')}<span class="book-bottom">押して、ひとつめくる ↻</span></button><div class="teacher-discovery" id="teacher-discovery" aria-live="polite" hidden></div></div><div class="axis-links" aria-label="ランキングの項目から探す">${chipLinks()}</div></div></div>
+      <div class="teacher-feature-body"><div class="teacher-feature-copy"><div class="section-label"><span>01</span>先生図鑑・ランキング</div><h2 id="teacher-feature-title">あの先生の、<br>知らなかった一面。</h2><p>生徒の声から、先生の個性と<br>授業を楽しむコツを見つけよう。</p><a class="text-link" href="#teachers">先生図鑑をひらく ${arrow}</a></div>
+      <div class="teacher-feature-visual"><div class="open-book"><span class="book-center" aria-hidden="true"></span><h3>先生の魅力、5つの見方</h3><div class="axis-links" aria-label="ランキングの項目から探す">${chipLinks()}</div><a class="text-link" href="#teachers/rankings">ランキングをひらく ${arrow}</a></div></div></div>
+      <div class="status-note"><span class="status-dot" aria-hidden="true"></span><p>アンケート集計準備中。先生の紹介や生徒の声は、確認後に順次掲載します。</p></div>
     </section>
-    <section class="activities-section content-width" id="home-activities" aria-labelledby="activities-title"><div class="section-heading"><span class="eyebrow">FIND YOUR PLACE</span><h2 id="activities-title">あなたに合う活動を、<br class="mobile-only">見つけよう。</h2><p>一覧からじっくり探す？ 診断から出会ってみる？</p></div>
-      <div class="activity-pair">${activityEntry('clubs')}${activityEntry('committees')}</div>
-    </section>
-    <section class="voices-feature content-width"><div class="voice-decoration" aria-hidden="true">${icon('chat')}</div><div><span class="eyebrow">STUDENT VOICES</span><h2>この学校、実際どう？</h2><p>よかったことも、大変だったことも。<br>学校生活の本音と、新入生へのひとこと。</p></div><a class="button button-outline" href="#voices">先輩の声を読む ${arrow}</a></section>
+    <section class="activities-section" id="home-activities" aria-labelledby="activities-title"><div class="content-width"><div class="section-heading"><span class="section-label"><span>02</span>部活動・委員会ガイド</span><h2 id="activities-title">あなたらしい場所、<br class="mobile-only">見つけよう。</h2><p>好きなこと、得意なこと。<br class="mobile-only">5つの質問から探してみませんか。</p></div><div class="activity-pair">${activityEntry('clubs')}${activityEntry('committees')}</div></div></section>
+    <section class="voices-feature content-width"><div class="voice-decoration" aria-hidden="true">${icon('chat')}</div><div><span class="section-label"><span>03</span>生徒の声</span><h2>この学校、実際どう？</h2><p>よかったことも、大変だったことも。<br>学校生活の本音と、新入生へのひとこと。</p></div><a class="button button-outline" href="#voices">先輩の声を読む ${arrow}</a></section>
     <div class="about-link content-width"><span>生徒の声を、どう集めて伝えるか。</span><a href="#about">このサイトについて ${arrow}</a></div>`;
 }
 
