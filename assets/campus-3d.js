@@ -15,16 +15,45 @@ window.Campus3D = (() => {
  const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
  function project(p,yaw,elev){const x=p[0]-1185,y=p[1]-953,z=p[2]||0,c=Math.cos(yaw),s=Math.sin(yaw),rx=x*c-y*s,d=x*s+y*c;return [rx,d*Math.sin(elev)-z*Math.cos(elev),d*Math.cos(elev)+z*Math.sin(elev)];}
  function extent(yaw,elev){const ps=[...ground.map(p=>[...p,0]),...models.flatMap(m=>m.poly.map(p=>[...p,m.height]))].map(p=>project(p,yaw,elev));const xs=ps.map(p=>p[0]),ys=ps.map(p=>p[1]);return [Math.min(...xs),Math.min(...ys),Math.max(...xs),Math.max(...ys)];}
+ function floorLayout(id,floor){
+  if(!models.some(m=>m.id===id)||Number(floor)<1)return null;
+  const rooms=window.CAMPUS_GUIDE.rooms.filter(r=>r.building===id&&r.floor===Number(floor));if(!rooms.length)return null;
+  const minX=Math.min(...rooms.map(r=>r.rect[0])),minY=Math.min(...rooms.map(r=>r.rect[1])),maxX=Math.max(...rooms.map(r=>r.rect[0]+r.rect[2])),maxY=Math.max(...rooms.map(r=>r.rect[1]+r.rect[3]));
+  const cx=(minX+maxX)/2,cy=(minY+maxY)/2;
+  const transform=(x,y)=>[1185+x-cx,953+y-cy];
+  const cells=rooms.map(r=>({...r,poly:[transform(r.rect[0],r.rect[1]),transform(r.rect[0]+r.rect[2],r.rect[1]),transform(r.rect[0]+r.rect[2],r.rect[1]+r.rect[3]),transform(r.rect[0],r.rect[1]+r.rect[3])]}));
+  const pad=8,slab=[transform(minX-pad,minY-pad),transform(maxX+pad,minY-pad),transform(maxX+pad,maxY+pad),transform(minX-pad,maxY+pad)];
+  return {id,floor:Number(floor),cells,slab};
+ }
+ function layoutExtent(layout,yaw,elev){const points=layout.slab.flatMap(p=>[[...p,0],[...p,6]]).map(p=>project(p,yaw,elev));return [Math.min(...points.map(p=>p[0])),Math.min(...points.map(p=>p[1])),Math.max(...points.map(p=>p[0])),Math.max(...points.map(p=>p[1]))];}
+ function renderFloor(layout,P,focusedRoom){
+  const poly=(points,attr)=>`<polygon points="${points.map(p=>{const q=P(p);return q[0].toFixed(2)+','+q[1].toFixed(2);}).join(' ')}" ${attr}/>`;
+  const faces=[],text=[];const palette={class:'#d5e9d7',science:'#d9eaf0',music:'#e6dff0',art:'#f1e0c4',steam:'#d3e8e8',health:'#f2dedc',wc:'#e2e8e6',stairs:'#dedfd7',staff:'#e8e5d9',research:'#e7e4d5'};
+  let out=poly(layout.slab.map(p=>[...p,0]),'fill="#f1eee2" stroke="#b4c3b2" stroke-width="1.4"');
+  for(const r of layout.cells){
+   const active=r.id===focusedRoom,color=active?'#83cbb4':r.closed?'#e6dfd4':palette[r.type]||'#e4ebd9';
+   for(let i=0;i<4;i++){const a=r.poly[i],b=r.poly[(i+1)%4],ps=[[...a,.5],[...b,.5],[...b,4],[...a,4]];faces.push({depth:ps.reduce((s,p)=>s+P(p)[2],0)/4,svg:poly(ps,`fill="${r.closed?'#c3bbac':'#b8cdb8'}" stroke="#849b89" stroke-width=".6" data-campus-room="${r.id}"`)});}
+   const top=r.poly.map(p=>[...p,4]);faces.push({depth:top.reduce((s,p)=>s+P(p)[2],0)/4,svg:`<g role="button" tabindex="0" data-campus-room="${r.id}" aria-label="${esc(r.building+' '+r.floor+'階 '+r.name+(r.closed?'、工事中・閉鎖':''))}" class="floor-room ${active?'selected':''}"><title>${esc(r.name)}</title>${poly(top,`fill="${color}" stroke="${active?'#197b69':'#7e9783'}" stroke-width="${active?2.2:1}"`)}</g>`});
+   const qs=top.map(P),w=Math.max(...qs.map(q=>q[0]))-Math.min(...qs.map(q=>q[0])),h=Math.max(...qs.map(q=>q[1]))-Math.min(...qs.map(q=>q[1]));
+   const center=P([(r.poly[0][0]+r.poly[2][0])/2,(r.poly[0][1]+r.poly[2][1])/2,4.1]);
+   const name=r.type==='class'?r.name.replace('年','').replace('組',''):r.type==='wc'?'WC':r.name;
+   const count=name.length<=5?name.length:Math.ceil(name.length/2),font=Math.min(14,Math.max(6,(w-7)/Math.max(2,count))),lines=[];for(let i=0;i<name.length;i+=Math.max(2,count))lines.push(name.slice(i,i+Math.max(2,count)));
+   if(font>=10&&w>=18&&h>=font*lines.length*1.2+3)text.push(`<text x="${center[0]}" y="${center[1]-(lines.length-1)*font*.6+font*.32}" text-anchor="middle" class="floor-room-name" style="font-size:${font}px" pointer-events="none">${lines.map((line,i)=>`<tspan x="${center[0]}" dy="${i?font*1.2:0}">${esc(line)}</tspan>`).join('')}</text>`);
+  }
+  faces.sort((a,b)=>a.depth-b.depth);return out+faces.map(f=>f.svg).join('')+text.join('');
+ }
+
  function mount(host,options={}){
-  let yaw=-.38,elev=.85,zoom=1,pan=[0,0],selected='',filterFloor='all',width=800,height=560,frame=0,disposed=false;
+  let yaw=-.38,elev=.85,zoom=1,pan=[0,0],selected='',filterFloor='all',width=800,height=560,frame=0,disposed=false,layout=null,highlightedRoom=null;
   const pointers=new Map();let gesture=null;
-  host.innerHTML='<svg class="campus-scene" tabindex="0" role="group" aria-label="学校の3Dマップ。指1本で回転、2本指で拡大・縮小と移動。建物をタップして教室一覧を開きます。"></svg>';
+  host.innerHTML='<svg class="campus-scene" tabindex="0" role="group" aria-label="学校の3Dマップ。指1本で回転、2本指で拡大・縮小と移動。建物をタップして階別の教室配置を開きます。"></svg>';
   const svg=host.firstElementChild;
   function screen(p){const b=svg.getBoundingClientRect();return [p[0]-b.left,p[1]-b.top];}
-  function viewMetrics(){const box=extent(yaw,elev),fit=Math.min((width-64)/(box[2]-box[0]),(height-80)/(box[3]-box[1]));return {box,fit:Math.max(.01,fit),cx:(box[0]+box[2])/2,cy:(box[1]+box[3])/2};}
+  function viewMetrics(){const box=layout?layoutExtent(layout,yaw,elev):extent(yaw,elev),fit=Math.min((width-64)/(box[2]-box[0]),(height-80)/(box[3]-box[1]));return {box,fit:Math.max(.01,fit),cx:(box[0]+box[2])/2,cy:(box[1]+box[3])/2};}
   function limitPan(){if(zoom<=1.0001){zoom=1;pan=[0,0];return;}const {box,fit}=viewMetrics(),scale=fit*zoom,bw=(box[2]-box[0])*scale,bh=(box[3]-box[1])*scale;const mx=Math.max(0,(bw-width)/2+width*.25),my=Math.max(0,(bh-height)/2+height*.25);pan=[clamp(pan[0],-mx,mx),clamp(pan[1],-my,my)];}
-  function draw(){if(disposed)return;const focusedBuilding=svg.contains(document.activeElement)?document.activeElement.closest('[data-campus-building]')?.dataset.campusBuilding:null;limitPan();const {fit,cx,cy}=viewMetrics(),scale=fit*zoom;
+  function draw(){if(disposed)return;const focusedBuilding=svg.contains(document.activeElement)?document.activeElement.closest('[data-campus-building]')?.dataset.campusBuilding:null,focusedRoom=svg.contains(document.activeElement)?document.activeElement.closest('[data-campus-room]')?.dataset.campusRoom:null;limitPan();const {fit,cx,cy}=viewMetrics(),scale=fit*zoom;
    const P=p=>{const v=project(p,yaw,elev);return [(v[0]-cx)*scale+width/2+pan[0],(v[1]-cy)*scale+height/2+pan[1],v[2]];};
+   if(layout){svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.innerHTML=renderFloor(layout,P,highlightedRoom);if(focusedRoom||focusedBuilding)(svg.querySelector(`.floor-room[data-campus-room="${focusedRoom}"]`)||svg).focus({preventScroll:true});options.onLimit?.({min:zoom<=1.0001,max:zoom>=5.999});return;}
    const polygon=(points,attrs='')=>`<polygon points="${points.map(p=>{const q=P(p);return q[0].toFixed(2)+','+q[1].toFixed(2);}).join(' ')}" ${attrs}/>`;
    const flat=(poly,z,attrs)=>polygon(poly.map(p=>[...p,z]),attrs);
    let out='<defs><pattern id="site-grain" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".6" fill="#8eae8b" opacity=".12"/></pattern></defs>';
@@ -58,7 +87,7 @@ window.Campus3D = (() => {
     const shown=compact&&id==='仮設校舎'?'仮設':text.replace(compact?'・工事中':'__none__',''),font=compact?11:14,w=Math.max(compact?40:65,shown.length*font+(compact?12:20)),h=compact?24:30,candidates=[];
     for(let radius=0;radius<=220;radius+=22){for(let i=0;i<8;i++){const a=-Math.PI/2+i*Math.PI/4;candidates.push([clamp(q[0]+Math.cos(a)*radius,w/2+5,width-w/2-5),clamp(q[1]-16+Math.sin(a)*radius,h/2+5,height-h/2-5)]);}}
     const position=candidates.find(([x,y])=>!labels.some(b=>Math.abs(b.x-x)<(b.w+w)/2+4&&Math.abs(b.y-y)<(b.h+h)/2+4));if(!position)return '';
-    const [x,y]=position;labels.push({x,y,w,h});return `<g ${id?`data-campus-building="${id}" role="button" tabindex="0" aria-label="${esc(id)}の教室一覧"`:''} class="building-label"><path d="M${q[0]},${q[1]}L${x},${y+h/2}" fill="none" stroke="#84a18b" stroke-width=".8" pointer-events="none"/><rect x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" rx="${h/2}" fill="${id===selected?'#197b69':'#fff'}" stroke="${id===selected?'#197b69':'#c6d5c9'}"/><text x="${x}" y="${y+font*.35}" style="font-size:${font}px" fill="${id===selected?'#fff':'#305842'}" text-anchor="middle">${esc(shown)}</text></g>`;};
+    const [x,y]=position;labels.push({x,y,w,h});return `<g ${id?`data-campus-building="${id}" role="button" tabindex="0" aria-label="${esc(id)}の階別教室配置"`:''} class="building-label"><path d="M${q[0]},${q[1]}L${x},${y+h/2}" fill="none" stroke="#84a18b" stroke-width=".8" pointer-events="none"/><rect x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" rx="${h/2}" fill="${id===selected?'#197b69':'#fff'}" stroke="${id===selected?'#197b69':'#c6d5c9'}"/><text x="${x}" y="${y+font*.35}" style="font-size:${font}px" fill="${id===selected?'#fff':'#305842'}" text-anchor="middle">${esc(shown)}</text></g>`;};
    for(const m of models){const h=filterFloor!=='all'&&selected===m.id?Math.min(m.height,m.height/m.floors*Number(filterFloor)):m.height;out+=label(m.id+(m.closed?'・工事中':''),[...m.label,h+2],m.id);}
    if(zoom<2){out+=label('グラウンド',[1395,895,0]);out+=label('プール',[1320,1105,0]);}
    svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.innerHTML=out;if(focusedBuilding){const target=svg.querySelector(`.building-label[data-campus-building="${focusedBuilding}"]`);(target||svg).focus({preventScroll:true});}
@@ -67,15 +96,15 @@ window.Campus3D = (() => {
   function paint(){if(!frame)frame=requestAnimationFrame(()=>{frame=0;draw();});}
   function setZoom(next,point=[width/2,height/2]){const old=zoom;zoom=clamp(next,1,6);const factor=zoom/old;pan=[point[0]-width/2-(point[0]-width/2-pan[0])*factor,point[1]-height/2-(point[1]-height/2-pan[1])*factor];limitPan();paint();}
   function start(){const ps=[...pointers.values()];if(ps.length>=2){const a=ps[0],b=ps[1];gesture={type:'pinch',distance:Math.hypot(a.x-b.x,a.y-b.y),zoom,pan:[...pan],mid:screen([(a.x+b.x)/2,(a.y+b.y)/2]),moved:true};}else if(ps.length===1){const p=ps[0];gesture={type:'orbit',x:p.x,y:p.y,yaw,elev,moved:true,id:null};}else gesture=null;}
-  svg.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});svg.setPointerCapture(e.pointerId);if(pointers.size===1)gesture={type:e.shiftKey?'pan':'orbit',x:e.clientX,y:e.clientY,yaw,elev,pan:[...pan],moved:false,id:e.target.closest('[data-campus-building]')?.dataset.campusBuilding};else start();});
+  svg.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});svg.setPointerCapture(e.pointerId);if(pointers.size===1)gesture={type:e.shiftKey?'pan':'orbit',x:e.clientX,y:e.clientY,yaw,elev,pan:[...pan],moved:false,id:e.target.closest('[data-campus-building]')?.dataset.campusBuilding,room:e.target.closest('[data-campus-room]')?.dataset.campusRoom};else start();});
   svg.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId)||!gesture)return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});const ps=[...pointers.values()];if(ps.length>=2){const a=ps[0],b=ps[1],mid=screen([(a.x+b.x)/2,(a.y+b.y)/2]),factor=clamp(gesture.zoom*Math.hypot(a.x-b.x,a.y-b.y)/Math.max(1,gesture.distance),1,6)/gesture.zoom;zoom=gesture.zoom*factor;pan=[mid[0]-width/2-(gesture.mid[0]-width/2-gesture.pan[0])*factor,mid[1]-height/2-(gesture.mid[1]-height/2-gesture.pan[1])*factor];}
    else{const dx=e.clientX-gesture.x,dy=e.clientY-gesture.y;if(Math.hypot(dx,dy)>7)gesture.moved=true;if(!gesture.moved)return;if(gesture.type==='pan')pan=[gesture.pan[0]+dx,gesture.pan[1]+dy];else{yaw=gesture.yaw+dx*.008;elev=clamp(gesture.elev+dy*.005,.28,Math.PI/2-.01);}}limitPan();paint();});
-  const finish=(e,cancel=false)=>{if(!pointers.has(e.pointerId))return;const pick=!cancel&&pointers.size===1&&gesture&&!gesture.moved?gesture.id:null;pointers.delete(e.pointerId);if(svg.hasPointerCapture(e.pointerId))svg.releasePointerCapture(e.pointerId);start();if(pick)options.onSelect?.(pick);};
+  const finish=(e,cancel=false)=>{if(!pointers.has(e.pointerId))return;const tap=!cancel&&pointers.size===1&&gesture&&!gesture.moved,pick=tap?gesture.id:null,pickRoom=tap?gesture.room:null;pointers.delete(e.pointerId);if(svg.hasPointerCapture(e.pointerId))svg.releasePointerCapture(e.pointerId);start();if(pickRoom)options.onSelectRoom?.(pickRoom);else if(pick)options.onSelect?.(pick);};
   svg.addEventListener('pointerup',e=>finish(e));svg.addEventListener('pointercancel',e=>finish(e,true));svg.addEventListener('lostpointercapture',e=>{if(pointers.has(e.pointerId)){pointers.delete(e.pointerId);start();}});
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom*Math.exp(-clamp(e.deltaY,-100,100)*.004),screen([e.clientX,e.clientY]));},{passive:false});
-  svg.addEventListener('keydown',e=>{const id=e.target.closest('[data-campus-building]')?.dataset.campusBuilding;if(id&&(e.key==='Enter'||e.key===' ')){e.preventDefault();options.onSelect?.(id);return;}if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','+','=','-','0'].includes(e.key)){e.preventDefault();if(e.key==='ArrowLeft')yaw-=.15;else if(e.key==='ArrowRight')yaw+=.15;else if(e.key==='ArrowUp')elev=clamp(elev+.12,.28,1.56);else if(e.key==='ArrowDown')elev=clamp(elev-.12,.28,1.56);else if(e.key==='-')setZoom(zoom/1.4);else if(e.key==='0'){zoom=1;pan=[0,0];}else setZoom(zoom*1.4);paint();}});
+  svg.addEventListener('keydown',e=>{const roomId=e.target.closest('[data-campus-room]')?.dataset.campusRoom;if(roomId&&(e.key==='Enter'||e.key===' ')){e.preventDefault();options.onSelectRoom?.(roomId);return;}const id=e.target.closest('[data-campus-building]')?.dataset.campusBuilding;if(id&&(e.key==='Enter'||e.key===' ')){e.preventDefault();options.onSelect?.(id);return;}if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','+','=','-','0'].includes(e.key)){e.preventDefault();if(e.key==='ArrowLeft')yaw-=.15;else if(e.key==='ArrowRight')yaw+=.15;else if(e.key==='ArrowUp')elev=clamp(elev+.12,.28,1.56);else if(e.key==='ArrowDown')elev=clamp(elev-.12,.28,1.56);else if(e.key==='-')setZoom(zoom/1.4);else if(e.key==='0'){zoom=1;pan=[0,0];}else setZoom(zoom*1.4);paint();}});
   const observer=new ResizeObserver(()=>{if(!host.isConnected){observer.disconnect();return;}const b=host.getBoundingClientRect();width=Math.max(260,b.width);height=Math.max(300,b.height);limitPan();paint();});observer.observe(host);const b=host.getBoundingClientRect();width=Math.max(260,b.width);height=Math.max(300,b.height);draw();
-  return {select(id,f='all'){selected=id==='すべて'||id==='屋外'?'':id;filterFloor=f;paint();},zoomIn(){setZoom(zoom*1.4);},zoomOut(){setZoom(zoom/1.4);},reset(){yaw=-.38;elev=.85;zoom=1;pan=[0,0];paint();},top(){elev=Math.PI/2-.01;zoom=1;pan=[0,0];paint();},destroy(){disposed=true;observer.disconnect();if(frame)cancelAnimationFrame(frame);}};
+  return {select(id,f='all'){const next=f!=='all'?floorLayout(id,f):null,changed=(layout?.id||'')!==(next?.id||'')||(layout?.floor||0)!==(next?.floor||0);selected=id==='すべて'||id==='屋外'?'':id;filterFloor=f;if(changed){zoom=1;pan=[0,0];if(next&&!layout){yaw=0;elev=1.15;}else if(!next&&layout){yaw=-.38;elev=.85;}}layout=next;paint();},highlightRoom(id){highlightedRoom=id;paint();},zoomIn(){setZoom(zoom*1.4);},zoomOut(){setZoom(zoom/1.4);},reset(){yaw=-.38;elev=.85;zoom=1;pan=[0,0];paint();},top(){elev=Math.PI/2-.01;zoom=1;pan=[0,0];paint();},destroy(){disposed=true;observer.disconnect();if(frame)cancelAnimationFrame(frame);}};
  }
- return {mount,models,project,extent,source};
+ return {mount,models,project,extent,source,floorLayout,layoutExtent};
 })();

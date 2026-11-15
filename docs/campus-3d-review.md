@@ -37,3 +37,12 @@
 - https://chugaku.fuzoku.okayama-u.ac.jp/wp/wp-content/themes/okafucyu/assets/files/aboutus/file01.pdf?260826
 - https://www.okayama-u.ac.jp/up_load_files/shisetu-pdf/setumei07-9.pdf#page=29
 - https://www.okayama-u.ac.jp/up_load_files/shisetu-pdf/setumei06-22.pdf#page=23
+
+
+## 2026-11-16: Floor-by-floor 3D room layouts
+
+Added building selector and exterior/1F/2F/3F controls inside the 3D stage. Selecting an exterior building opens its first-floor layout; each room opens its existing detail dialog by tap or Enter. Floor layouts extrude the official guide schematic without changing any rectangle dimensions or relative positions. They are explicitly schematic, not surveyed interiors. Old 2号館 rooms retain construction notices.
+
+Independent AI review verified all 12 floors / 93 indoor locations against source rectangles and PDF labels; rotated bounds, zoom limits, tap/Enter, exterior return and weekly-table regression checks passed. It identified lost keyboard focus on exterior-to-floor switching and inconsistent outdoor navigation; both were fixed and re-reviewed, with no remaining required fixes in the review scope.
+
+Browser QA confirmed 3号館 1F/2F, room-detail tap and return, 仮設校舎 1F/2F, 1号館 3F, and 390px floor controls without page overflow. Small labels below 10px are hidden until zoomed rather than shown illegibly. Weekly table remains unchanged.
