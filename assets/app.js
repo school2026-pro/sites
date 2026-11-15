@@ -34,6 +34,7 @@ function home() {
       <div class="status-note"><span class="status-dot" aria-hidden="true"></span><p>アンケート集計準備中。先生の紹介や生徒の声は、確認後に順次掲載します。</p></div>
     </section>
     <section class="activities-section" id="home-activities" aria-labelledby="activities-title"><div class="content-width"><div class="section-heading"><span class="section-label"><span>02</span>部活動・委員会ガイド</span><h2 id="activities-title">あなたらしい場所、<br class="mobile-only">見つけよう。</h2><p>好きなこと、得意なこと。<br class="mobile-only">5つの質問から探してみませんか。</p></div><div class="activity-pair">${activityEntry('clubs')}${activityEntry('committees')}</div></div></section>
+    ${SchoolDay.entry()}
     <section class="voices-feature content-width"><div class="voice-decoration" aria-hidden="true">${icon('chat')}</div><div><span class="section-label"><span>03</span>生徒の声</span><h2>この学校、実際どう？</h2><p>よかったことも、大変だったことも。<br>学校生活の本音と、新入生へのひとこと。</p></div><a class="button button-outline" href="#voices">先輩の声を読む ${arrow}</a></section>
     <div class="about-link content-width"><span>生徒の声を、どう集めて伝えるか。</span><a href="#about">このサイトについて ${arrow}</a></div>`;
 }
@@ -173,9 +174,10 @@ function render() {
   else if(page==='clubs'||page==='committees'){if(mode==='quiz')quizPage(page);else activityList(page);}
   else if(page==='voices')voices();
   else if(page==='about')about();
+  else if(page==='day')SchoolDay.render(mode);
   else if(page==='saved'){main.innerHTML=GuidePlay.savedPage();}
   else home();
-  const titles={teachers:'先生図鑑・ランキング',clubs:mode==='quiz'?'部活診断':'部活動ガイド',committees:mode==='quiz'?'委員会診断':'委員会ガイド',voices:'学校生活の本音',saved:'気になるリスト',about:'このサイトについて'};
+  const titles={day:'学校の一日・校内マップ',teachers:'先生図鑑・ランキング',clubs:mode==='quiz'?'部活診断':'部活動ガイド',committees:mode==='quiz'?'委員会診断':'委員会ガイド',voices:'学校生活の本音',saved:'気になるリスト',about:'このサイトについて'};
   document.title=`${titles[page]||'ホーム'} | スクールライフ完全攻略`;
   GuidePlay.enhance();
   if(oldPage)main.focus({preventScroll:true});
@@ -192,3 +194,4 @@ dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog
 document.addEventListener('click',event=>{const button=event.target.closest('.saved-page [data-detail]');if(button){const item=[...D.clubs,...D.committees].find(x=>x.id===button.dataset.detail);if(item)showDetail(item);}});
 window.addEventListener('hashchange',render);
 render();
+
