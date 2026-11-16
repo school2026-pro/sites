@@ -21,6 +21,8 @@ const chipLinks = () => Object.entries(axes).map(([key,label],i) => `<a class="a
 let focusAfterDialog = null;
 let currentQuiz = {type:null,step:0,answers:[],result:false};
 
+function plannerPage(){main.innerHTML=`<div class="content-width inner-page planner-intro"><a class="back-link" href="#home">← ホームへ</a>${heading('MY NOTEBOOK / ログインして使う','今日を整える。<br>明日につなげる。','予定も、一日の振り返りも、自分だけの手帳に。')}<section class="planner-login-card"><div><span class="eyebrow">あなた専用のマイ手帳</span><h2>学校生活を、自分のペースで。</h2><p>ChatGPTでログインすると、予定と振り返りをアカウントごとに保存できます。自分のスマホでも、パソコンでも、同じ記録を続けられます。</p><a class="button" href="https://school-life-planner.kandodaiary.chatgpt.site/">マイ手帳を開く・ログイン →</a><p class="small">ログイン前に、保存せず操作を試すこともできます。</p></div><ol><li><span>01</span><div><h3>予定を、見渡す。</h3><p>月・週カレンダー、予定とタスクの管理、完了チェック、時刻の重複確認。</p></div></li><li><span>02</span><div><h3>一日を、振り返る。</h3><p>できたこと・つまずき・気づき・次の一歩。登録したタスクの実績も見比べられます。</p></div></li><li><span>03</span><div><h3>明日の行動へ、つなげる。</h3><p>振り返りから翌日のタスクを作成。一週間の学習時間と完了状況を確認できます。</p></div></li></ol></section><p class="planner-privacy">学校案内はこれまでどおりログイン不要です。マイ手帳は認証と個人別保存に対応した専用ページで開きます。振り返りの分析は、記録に基づく集計とガイドです。</p></div>`;}
+
 function home() {
   main.innerHTML = `
     <section class="hero" aria-labelledby="hero-title">
@@ -28,6 +30,7 @@ function home() {
       <div class="hero-content"><span class="eyebrow">岡山大学附属中学校<span class="school-separator">｜</span>生徒による探究企画</span><h1 id="hero-title">知ると、<br><span class="hero-second">学校はもっと<span class="hero-ending">楽しい。</span></span></h1><p>先生のこと。部活のこと。<br class="mobile-only">先輩たちの本音から。</p><a class="button" href="#teachers"><span class="hero-cta-long">先生図鑑・ランキングを見る</span><span class="hero-cta-short">先生図鑑・ランキングへ</span> ${arrow}</a><a class="hero-sub-link" href="#home-activities">部活・委員会の診断へ <span aria-hidden="true">↓</span></a></div>
       <img class="campus campus-refined" src="assets/campus-refined.svg" width="640" height="230" alt="校舎と木々、本を描いた学校生活のイメージ">
     </section>
+    <section class="planner-home-entry content-width"><div><span class="eyebrow">NEW / MY NOTEBOOK</span><h2>今日の予定と振り返りを、ひとつに。</h2><p>自分だけのカレンダーと手帳を、ログインして使おう。</p></div><a class="button" href="#planner">マイ手帳へ →</a></section>
     <section class="teacher-feature content-width" aria-labelledby="teacher-feature-title">
       <div class="teacher-feature-body"><div class="teacher-feature-copy"><div class="section-label"><span>01</span>先生図鑑・ランキング</div><h2 id="teacher-feature-title">あの先生の、<br>知らなかった一面。</h2><p>生徒の声から、先生の個性と<br>授業を楽しむコツを見つけよう。</p><a class="text-link" href="#teachers">先生図鑑をひらく ${arrow}</a></div>
       <div class="teacher-feature-visual"><div class="open-book"><span class="book-center" aria-hidden="true"></span><h3>先生の魅力、5つの見方</h3><div class="axis-links" aria-label="ランキングの項目から探す">${chipLinks()}</div><a class="text-link" href="#teachers/rankings">ランキングをひらく ${arrow}</a></div></div></div>
@@ -175,9 +178,10 @@ function render() {
   else if(page==='voices')voices();
   else if(page==='about')about();
   else if(page==='day')SchoolDay.render(mode);
+  else if(page==='planner')plannerPage();
   else if(page==='saved'){main.innerHTML=GuidePlay.savedPage();}
   else home();
-  const titles={day:'学校の一日・校内マップ',teachers:'先生図鑑・ランキング',clubs:mode==='quiz'?'部活診断':'部活動ガイド',committees:mode==='quiz'?'委員会診断':'委員会ガイド',voices:'学校生活の本音',saved:'気になるリスト',about:'このサイトについて'};
+  const titles={planner:'ログイン・マイ手帳',day:'学校の一日・校内マップ',teachers:'先生図鑑・ランキング',clubs:mode==='quiz'?'部活診断':'部活動ガイド',committees:mode==='quiz'?'委員会診断':'委員会ガイド',voices:'学校生活の本音',saved:'気になるリスト',about:'このサイトについて'};
   document.title=`${titles[page]||'ホーム'} | スクールライフ完全攻略`;
   GuidePlay.enhance();
   if(oldPage)main.focus({preventScroll:true});
