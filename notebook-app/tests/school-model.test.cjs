@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict');
+const {blankSchoolDay,bagItems,copySchoolDay,keepPacked,schoolDayInput}=require('../.model-test/school-model.js');
+let count=0;const check=(fn)=>{fn();count++};
+const day=blankSchoolDay('2026-11-17');day.lessons[0]={subject:'国語',materials:'教科書、ノート\n筆箱',room:'教室'};day.lessons[1]={subject:'数学',materials:'筆箱\n定規',room:''};day.essentials='筆箱、給食セット';
+check(()=>assert.equal(bagItems(day).length,5));check(()=>assert.deepEqual(bagItems(day)[2].sources,['1限 国語','2限 数学','共通']));
+check(()=>assert.equal(schoolDayInput(day).lessons.length,6));
+day.packed=[0,2];const target={...blankSchoolDay('2026-11-24'),version:7},copy=copySchoolDay(day,target);
+check(()=>assert.equal(copy.date,'2026-11-24'));check(()=>assert.equal(copy.version,7));check(()=>assert.deepEqual(copy.packed,[]));copy.lessons[0].subject='英語';check(()=>assert.equal(day.lessons[0].subject,'国語'));check(()=>assert.deepEqual(day.packed,[0,2]));
+for(const patch of [{date:'2026-02-31'},{lessons:[]},{lessons:Array.from({length:9},()=>({subject:'',materials:'',room:''}))},{packed:[-1]},{packed:[99]},{packed:[0.2]},{packed:[0,0]},{note:'x'.repeat(1001)},{essentials:'x'.repeat(1201)}])check(()=>assert.throws(()=>schoolDayInput({...day,...patch})));
+check(()=>assert.throws(()=>schoolDayInput({...day,packed:[],essentials:'x'.repeat(81)})));
+const many={...blankSchoolDay('2026-11-17'),essentials:Array.from({length:65},(_,i)=>'item'+i).join('、')};check(()=>assert.throws(()=>schoolDayInput(many)));
+const normalized=blankSchoolDay('2026-11-17');normalized.essentials='Ａ４プリント、A4プリント';check(()=>assert.equal(bagItems(normalized).length,1));
+check(()=>assert.equal(schoolDayInput({...blankSchoolDay('2026-11-17'),packed:[]}).lessons.length,6));
+const expanded=keepPacked(day,{...day,essentials:'筆箱、給食セット、ハンカチ'});check(()=>assert.deepEqual(expanded.packed,[0,2]));
+const removed=keepPacked(day,{...day,lessons:day.lessons.map(l=>({...l,materials:l.materials.replace('国語の教科書','').replace('教科書、','')}))});check(()=>assert.ok(removed.packed.every(i=>bagItems(removed)[i])));
+console.log(`${count} timetable-model assertions passed.`);

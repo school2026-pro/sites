@@ -10,7 +10,8 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "check": "tsc --noEmit",
-    "test:rules": "firebase emulators:exec --only firestore --project demo-school-notebook \"node tests/rules.test.mjs\""
+    "test:rules": "firebase emulators:exec --only firestore --project demo-school-notebook \"node tests/rules.test.mjs\"",
+    "test:model": "node scripts/test-school-model.mjs"
   },
   "dependencies": {
     "firebase": "13.4.0",
