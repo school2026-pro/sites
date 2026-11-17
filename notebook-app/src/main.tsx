@@ -5,6 +5,7 @@ import {auth} from './firebase';
 import {createPlannerApi} from './store';
 import Planner,{type PlannerApi} from './Planner';
 import './style.css';
+import './design.css';
 
 function errorMessage(error:unknown){
  const code=(error as {code?:string})?.code;
