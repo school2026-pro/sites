@@ -4,3 +4,9 @@ node_modules/
 
 .model-test/
 mobile-qa.html
+
+.chat-test/
+chat-rules.fragment
+
+chat-qa.html
+chat-qa.tsx

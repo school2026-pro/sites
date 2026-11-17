@@ -26,4 +26,4 @@ jobs:
       - run: npm ci
       - run: npm run test:model
       - run: npm run build
-      - run: npx -y firebase-tools@15.36.0 emulators:exec --only firestore --project demo-school-notebook 'node tests/rules.test.mjs'
+      - run: npx -y firebase-tools@15.36.0 emulators:exec --only firestore --project demo-school-notebook 'node tests/rules.test.mjs && node tests/chat-rules.test.mjs && node tests/chat-client.test.mjs'

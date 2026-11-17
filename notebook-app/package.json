@@ -10,7 +10,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "check": "tsc --noEmit",
-    "test:rules": "firebase emulators:exec --only firestore --project demo-school-notebook \"node tests/rules.test.mjs\"",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-school-notebook \"node tests/rules.test.mjs && node tests/chat-rules.test.mjs && node tests/chat-client.test.mjs\"",
     "test:model": "node scripts/test-school-model.mjs"
   },
   "dependencies": {

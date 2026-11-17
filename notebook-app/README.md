@@ -9,7 +9,7 @@ GitHub Pagesの `/sites/notebook/` に配置する静的Reactアプリです。
 - Enterprise native Firestore: database ID `default`、東京 asia-northeast1、リアルタイム更新オン、Sparkプラン。
 - フロントエンド・保存処理・セキュリティルールを実装、ビルド成功。
 - 別AIによる独立レビューを実施。表示件数による欠落、編集後の追従、購読エラー復旧を修正。
-- ルールの54 assertionsがEnterpriseエミュレータで成功。
+- 手帳108件・チャット84件の権限テストがEnterpriseエミュレータで成功。
 - 本番Firestoreルールを2026-11-17に公開。GitHubへ静的版を配置。実アカウントの新規登録・保存は本人による最終確認が必要です。
 - Googleログインは未有効。運営者の個人用サポートメールを公開しないため。
 - 旧手帳の記録の自動移行は実装していません。旧サービスは維持します。
@@ -42,7 +42,7 @@ Firebaseの公開用Web設定はソース内にあります。管理者キー・
 Java21以上とFirebase CLIを使用します。CLIログイン不要のローカルテストです。
 
 ```sh
-npx -y firebase-tools@latest emulators:exec --only firestore --project demo-school-notebook 'node tests/rules.test.mjs'
+npx -y firebase-tools@latest emulators:exec --only firestore --project demo-school-notebook 'node tests/rules.test.mjs && node tests/chat-rules.test.mjs && node tests/chat-client.test.mjs'
 ```
 
 本番へのCLI反映は、所有者がCLIに認証済みの場合のみ、明示したプロジェクトへ行います。
@@ -53,7 +53,7 @@ npx -y firebase-tools@latest deploy --only firestore:rules --project school-pro-
 
 ## プライバシーと仕様
 
-- 所有者のUIDパス以外は拒否。匿名・他利用者の取得/一覧/書込を拒否。
+- 個人の予定・振り返り・時間割は本人のUIDパスだけに限定。チャットは以下の専用ルールで保護。
 - 各フィールドの型・長さ・列挙値とversionを作成/更新の両方で検査。
 - 作成時刻は不変、更新時刻はサーバー時刻。競合時は上書きせず再編集を案内。
 - 予定の削除は復元可能なsoft delete。別利用者の記録や親文書は読みません。
@@ -72,3 +72,15 @@ npx -y firebase-tools@latest deploy --only firestore:rules --project school-pro-
 時間割もFirestore `notebooks/{uid}/schooldays/{date}` で本人だけに限定。コピーはコピー先の版を保持し、準備チェックをリセットします。保存は明示操作です。調査と独立レビューは [docs/timetable-design-review.md](docs/timetable-design-review.md) を参照。
 
 `npm run test:model` で時間割のモデル検証を実行します。新JSを公開する前に更新したFirestoreルールを公開してください。
+
+## チャット（2026-11-17追加）
+
+「チャット」または `#chat` を開き、チャット専用の名前を登録します。登録は任意で、登録した名前と8文字コードをログイン済みの利用者が検索できます。ユーザー名は完全一致（英字大小・全半角を正規化）。名前が同じ利用者はコードで区別します。本名やメールアドレスを自動転記しません。
+
+相手へ申請→相手が承認→1対1で送受信。未読表示、過去50件ずつの読込、名前変更、ブロック・解除に対応。送信中の画面切替を防ぎ、未送信の文章は移動前に確認します。送信エラー時は入力を保持し、同じ送信IDで再試行することで重複を避けます。
+
+`chatProfiles`/`chatCodes` は認証済みユーザー用の検索名簿、`chatRooms`/`messages` は会話参加者だけ、`chatBlocks`/`chatState` は各本人だけに限定。ブロックは両方向の新規送信を拒否し、既存の履歴は保持します。相手の非公開手帳へのアクセス権は付与しません。チャット本文は手帳のJSON書き出し対象に含みません。
+
+画像・ファイル・グループ・通知メール・既読通知は実装していません。本文は1〜2000文字のプレーンテキスト。現段階のルールにはサーバー側の送信回数制限や通報窓口は含まれません。大規模公開の前には運用面の整備が必要です。エンドツーエンド暗号化ではなく、Firebaseプロジェクト管理者は管理権限でデータへアクセスできます。
+
+手帳108件、チャット84件のルール検証に加え、実際のクライアント処理をEnterpriseエミュレータ上の2利用者で検証（登録・名前/コード検索・承認・リアルタイム配信・送信再試行・未読マーカー・ブロック/解除・履歴）。スマホ幅320pxの画面操作は架空データのテスト用画面で確認。本番の実ユーザー2人による送受信確認は別途必要です。

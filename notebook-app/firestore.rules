@@ -79,6 +79,109 @@ service cloud.firestore {
    allow update: if isOwner(uid) && uidNotModified() && isValidSchoolDay(request.resource.data,id) && next(request.resource.data);
    allow delete: if false;
   }
+  // Chat public discovery: nickname/searchName/code only (no email or notebook data).
+  // chatProfiles/{uid}: name 2..24, searchName lowercase(name), immutable code,
+  // immutable createdAt, server updatedAt. chatCodes/{8chars}: immutable uid/time.
+  // chatRooms/{sortedUid~sortedUid}: exactly 2 immutable members; request/accept
+  // state; immutable creation time; last-message fields coupled to a new message.
+  // messages/{id}: immutable senderId/text(1..2000)/server creation timestamp.
+  // chatBlocks/{uid}/users/{otherUid}: owner-only block; server creation time.
+  // chatState/{uid}/rooms/{room}: owner-only monotonic read cursor, no message body.
+  function chatUid(v){ return v is string && v.size() >= 1 && v.size() <= 128 && !v.matches('.*[/~].*'); }
+  function chatCode(v){ return v is string && v.size() == 8 && v.matches('[A-HJ-NP-Z2-9]{8}'); }
+  function chatPair(r){return r.members is list && r.members.size()==2 && chatUid(r.members[0]) && chatUid(r.members[1]) && r.members[0] < r.members[1];}
+  function chatOwnPair(id){let pair=id.split('~');return isAuthenticated() && pair.size()==2 && chatUid(pair[0]) && chatUid(pair[1]) && pair[0]<pair[1] && request.auth.uid in pair;}
+  function chatMember(r){ return isAuthenticated() && request.auth.uid in r.members; }
+  function chatUnblocked(r){return !exists(/databases/$(database)/documents/chatBlocks/$(r.members[0])/users/$(r.members[1])) && !exists(/databases/$(database)/documents/chatBlocks/$(r.members[1])/users/$(r.members[0]));}
+  function isValidChatProfile(d){
+   let k=['name','searchName','code','createdAt','updatedAt'];
+   return d.keys().hasAll(k) && d.keys().hasOnly(k) && text(d.name,2,24) && d.name.matches('[^@\\r\\n\\t]+')
+    && d.searchName is string && d.searchName.size() <= 24 && d.searchName == d.name.lower()
+    && chatCode(d.code) && d.createdAt is timestamp && d.updatedAt == request.time;
+  }
+  match /chatProfiles/{uid} {
+   allow get: if isAuthenticated();
+   allow list: if isAuthenticated() && request.query.limit != null && request.query.limit <= 10;
+   allow create: if isOwner(uid) && isValidChatProfile(request.resource.data) && request.resource.data.createdAt == request.time
+    && getAfter(/databases/$(database)/documents/chatCodes/$(request.resource.data.code)).data.uid == uid;
+   allow update: if isOwner(uid) && isValidChatProfile(request.resource.data) && request.resource.data.createdAt == resource.data.createdAt && request.resource.data.code == resource.data.code;
+   allow delete: if false;
+  }
+  match /chatCodes/{code} {
+   allow get: if isAuthenticated();
+   allow list: if false;
+   allow create: if isAuthenticated() && chatCode(code) && request.resource.data.keys().hasAll(['uid','createdAt']) && request.resource.data.keys().hasOnly(['uid','createdAt'])
+    && request.resource.data.uid == request.auth.uid && request.resource.data.createdAt == request.time
+    && getAfter(/databases/$(database)/documents/chatProfiles/$(request.auth.uid)).data.code == code;
+   allow update,delete: if false;
+  }
+  function isValidChatRoom(d,id){
+   let k=['members','initiator','recipient','status','createdAt','updatedAt','lastMessageAt','lastMessageId','lastText','lastSender'];
+   return d.keys().hasAll(k) && d.keys().hasOnly(k) && chatPair(d) && id == d.members[0]+'~'+d.members[1]
+    && d.initiator in d.members && d.recipient in d.members && d.initiator != d.recipient
+    && d.status in ['pending','accepted','declined'] && d.createdAt is timestamp && d.updatedAt == request.time
+    && (d.lastMessageAt==null || d.lastMessageAt is timestamp) && text(d.lastMessageId,0,128) && text(d.lastText,0,2000) && text(d.lastSender,0,128);
+  }
+  function chatNewLast(d,id){
+   let p=/databases/$(database)/documents/chatRooms/$(id)/messages/$(d.lastMessageId);
+   let m=getAfter(p).data;
+   return d.status=='accepted' && resource.data.status=='accepted' && chatUnblocked(d)
+    && d.diff(resource.data).affectedKeys().hasOnly(['lastMessageAt','lastMessageId','lastText','lastSender','updatedAt'])
+    && !exists(p) && m.senderId==request.auth.uid && m.text==d.lastText && m.createdAt==request.time
+    && d.lastSender==request.auth.uid && d.lastMessageAt==request.time;
+  }
+  function chatStatusChange(d){
+   return d.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt']) && resource.data.status=='pending'
+    && ((d.status=='accepted' && request.auth.uid==resource.data.recipient && chatUnblocked(d)) || d.status=='declined');
+  }
+  function chatResend(d){
+   return resource.data.status=='declined' && d.status=='pending' && d.initiator==request.auth.uid && chatUnblocked(d)
+    && request.time >= resource.data.updatedAt + duration.value(30,'s')
+    && d.diff(resource.data).affectedKeys().hasOnly(['status','initiator','recipient','updatedAt']);
+  }
+  match /chatRooms/{id} {
+   // Only a prospective participant may probe an absent canonical room.
+   allow get: if chatOwnPair(id) && (!exists(/databases/$(database)/documents/chatRooms/$(id)) || chatMember(resource.data));
+   allow list: if chatMember(resource.data);
+   allow create: if isValidChatRoom(request.resource.data,id) && chatMember(request.resource.data) && request.resource.data.initiator==request.auth.uid
+    && request.resource.data.status=='pending' && request.resource.data.createdAt==request.time && chatUnblocked(request.resource.data)
+    && request.resource.data.lastMessageAt==null && request.resource.data.lastMessageId=='' && request.resource.data.lastText=='' && request.resource.data.lastSender==''
+    && exists(/databases/$(database)/documents/chatProfiles/$(request.resource.data.members[0])) && exists(/databases/$(database)/documents/chatProfiles/$(request.resource.data.members[1]));
+   allow update: if chatMember(resource.data) && isValidChatRoom(request.resource.data,id) && request.resource.data.members==resource.data.members && request.resource.data.createdAt==resource.data.createdAt
+    && (chatStatusChange(request.resource.data) || chatResend(request.resource.data) || chatNewLast(request.resource.data,id));
+   allow delete: if false;
+   match /messages/{messageId} {
+    function parentRoom(){return get(/databases/$(database)/documents/chatRooms/$(id)).data;}
+    function isValidChatMessage(d){return d.keys().hasAll(['senderId','text','createdAt']) && d.keys().hasOnly(['senderId','text','createdAt']) && d.senderId==request.auth.uid && text(d.text,1,2000) && d.text.matches('[\\s\\S]*[^\\s][\\s\\S]*') && d.createdAt==request.time;}
+    function linkedMessage(d){
+     let r=getAfter(/databases/$(database)/documents/chatRooms/$(id)).data;
+     return chatMember(r) && r.status=='accepted' && chatUnblocked(r) && r.lastMessageId==messageId && r.lastSender==d.senderId && r.lastText==d.text && r.lastMessageAt==request.time;
+    }
+    allow get: if chatMember(parentRoom()) && parentRoom().status=='accepted';
+    allow list: if chatMember(parentRoom()) && parentRoom().status=='accepted' && request.query.limit != null && request.query.limit <= 50;
+    allow create: if isAuthenticated() && isValidChatMessage(request.resource.data) && linkedMessage(request.resource.data);
+    allow update,delete: if false;
+   }
+  }
+  match /chatBlocks/{uid}/users/{otherUid} {
+   function isValidBlock(d){return d.keys().hasAll(['createdAt']) && d.keys().hasOnly(['createdAt']) && d.createdAt==request.time;}
+   allow read: if isOwner(uid);
+   allow create: if isOwner(uid) && chatUid(otherUid) && otherUid!=uid && isValidBlock(request.resource.data);
+   allow update: if false;
+   allow delete: if isOwner(uid);
+  }
+  match /chatState/{uid}/rooms/{id} {
+   function isValidRead(d){
+    let r=get(/databases/$(database)/documents/chatRooms/$(id)).data;
+    let m=get(/databases/$(database)/documents/chatRooms/$(id)/messages/$(d.lastMessageId)).data;
+    return d.keys().hasAll(['lastMessageId','lastReadAt','updatedAt']) && d.keys().hasOnly(['lastMessageId','lastReadAt','updatedAt'])
+     && text(d.lastMessageId,1,128) && d.lastReadAt is timestamp && d.lastReadAt==m.createdAt && d.updatedAt==request.time && chatMember(r) && r.status=='accepted';
+   }
+   allow read: if isOwner(uid);
+   allow create: if isOwner(uid) && isValidRead(request.resource.data);
+   allow update: if isOwner(uid) && isValidRead(request.resource.data) && request.resource.data.lastReadAt >= resource.data.lastReadAt;
+   allow delete: if false;
+  }
   match /{document=**} { allow read,write: if false; }
  }
 }

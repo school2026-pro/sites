@@ -52,6 +52,6 @@ function App(){
  const api=useMemo(()=>user?createPlannerApi(user.uid):signedOutApi,[user?.uid]);
  useEffect(()=>()=>{if('dispose' in api)(api as ReturnType<typeof createPlannerApi>).dispose();},[api]);
  if(!ready)return <main className="auth-loading" role="status">手帳を開いています…</main>;
- return <>{error&&<div className="error" role="alert">{error}</div>}<Planner key={user?.uid||'signed-out'} signedIn={!!user} displayName="あなた" api={api} onSignIn={()=>setShowAuth(true)} onSignOut={async()=>{try{await signOut(auth);}catch(error){throw new Error(errorMessage(error));}}}/>{showAuth&&!user&&<AuthDialog close={()=>setShowAuth(false)}/>}</>;
+ return <>{error&&<div className="error" role="alert">{error}</div>}<Planner key={user?.uid||'signed-out'} uid={user?.uid} signedIn={!!user} displayName="あなた" api={api} onSignIn={()=>setShowAuth(true)} onSignOut={async()=>{try{await signOut(auth);}catch(error){throw new Error(errorMessage(error));}}}/>{showAuth&&!user&&<AuthDialog close={()=>setShowAuth(false)}/>}</>;
 }
 createRoot(document.getElementById('root')!).render(<App/>);
