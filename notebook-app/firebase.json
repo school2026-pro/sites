@@ -1,0 +1,19 @@
+{
+  "firestore": {
+    "database": "default",
+    "edition": "enterprise",
+    "location": "asia-northeast1",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8080,
+      "edition": "enterprise"
+    },
+    "ui": {
+      "enabled": false
+    },
+    "singleProjectMode": true
+  }
+}

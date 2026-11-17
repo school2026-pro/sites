@@ -92,3 +92,12 @@ node --check assets/data.js
 - 「気になる」で部活・委員会それぞれ3件までメモし、活動内容・頻度・雰囲気を比較。データ未掲載項目は集計準備中と表示。
 - メモは `school-guide-interests-v1` キーでこのブラウザのlocalStorageに活動IDだけを保存。外部送信・名前・診断回答の保存なし。保存機能が使えない場合はメモリ内で動作します。
 - `assets/features.js` がこれらの機能を担当。動きを減らす設定ではアニメーションを抑制します。
+
+
+## マイ手帳（Firebase）
+
+- 公開パス: https://school2026-pro.github.io/sites/notebook/
+- メール・パスワード認証で予定と振り返りを本人だけのFirestore領域へ保存。
+- ソース: `notebook-app/`。ビルド済み静的ファイル: `notebook/`。
+- Firebase管理者の秘密鍵は不要。公開用Web設定とSecurity Rulesを使用します。
+- 実行・検証・仕様は `notebook-app/README.md` を参照。
