@@ -7,3 +7,163 @@ body{font-size:17px;line-height:1.9;background:#fdfdf9}h1,h2,h3{letter-spacing:-
 .hero-content{text-align:left}.hero-content>h1,.hero-content>p{margin-left:0;margin-right:0}.hero-content>.button{margin-left:0;margin-right:0}.hero-sub-link{display:block;width:max-content;max-width:100%;margin-left:0;margin-right:0}.brand,.desktop-nav a,.purpose-links a{color:var(--ink)}.desktop-nav a.planner-nav{color:#fff}
 @media(min-width:1151px){.mobile-menu{display:none!important}}
 @media(max-width:700px){.weekly-table tbody th{font-size:13px;line-height:1.7}.merged-time{font-size:13px}.merged-time small{font-size:12px}.common-cell .daily-cell-time{font-size:15px}.weekly-hint,.weekly-notes,.day-sources{font-size:14px;line-height:1.9}.three-instructions{font-size:14px}.three-toolbar button{min-height:44px}.campus-room-panel p{font-size:15px;line-height:1.9}}
+
+/* ==========================================================
+   仕上げ 2026-11-24
+   日本語の改行・小見出し・文字サイズの下限・ページ見出し・一覧の密度を整える。
+   このファイルの最後に置き、上の指定を上書きする。
+   ========================================================== */
+
+/* 1. 日本語の改行：Chrome/Edgeでは文節で改行し、見出しは行の長さをそろえる */
+body { word-break: auto-phrase; }
+h1, h2, h3 { text-wrap: balance; }
+.about-page section p, .voice-card p, dialog p, .day-sources p, .planner-login-card p, blockquote { word-break: normal; }
+
+/* 2. 小見出しラベル：日本語＋短い線で統一 */
+.eyebrow,
+.purpose-heading > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.7;
+  letter-spacing: 0.06em;
+  color: var(--green);
+}
+.eyebrow::before,
+.purpose-heading > span::before {
+  content: "";
+  flex-shrink: 0;
+  width: 22px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+/* 3. ページ見出し：左揃え＋区切り線 */
+.page-heading {
+  text-align: left;
+  padding: 8px 0 30px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--line);
+}
+.page-heading h1 {
+  margin: 14px 0 12px;
+  font-size: clamp(34px, 3.6vw, 50px);
+  line-height: 1.4;
+  letter-spacing: -0.03em;
+}
+.page-heading > p {
+  margin: 0;
+  max-width: 720px;
+  font-size: 18px;
+  color: var(--muted);
+}
+
+/* 4. 文字サイズの下限（PC） */
+.brand small { font-size: 13px; }
+.desktop-nav a { font-size: 15px; }
+.hero-content > .eyebrow { font-size: 14px; }
+.hero-description { font-size: 16px; max-width: 470px; }
+.hero-sub-link { font-size: 15px; }
+.purpose-heading { display: block; margin-bottom: 20px; }
+.purpose-heading h2 {
+  margin: 10px 0 0;
+  font-size: clamp(26px, 2.6vw, 34px);
+  font-weight: 700;
+  line-height: 1.5;
+}
+.purpose-links strong { font-size: 18px; }
+.purpose-links small { font-size: 14px; }
+.purpose-number { font-size: 14px; font-weight: 700; color: var(--green); }
+.purpose-links b { font-size: 20px; transition: transform 0.16s; }
+.purpose-links > a:hover b { transform: translateX(3px); }
+.planner-home-entry .eyebrow { font-size: 13px; }
+.planner-home-entry p { font-size: 16px; }
+.status-note, .status-note p { font-size: 15px; }
+.context-note p, .result-count { font-size: 15px; }
+.small { font-size: 15px; }
+.about-link { font-size: 16px; }
+.footer-links a, .footer-bottom { font-size: 15px; }
+.site-footer .small { font-size: 14px; }
+
+/* 5. 部活動・委員会の一覧：準備中の文言を繰り返さず、カードを詰める */
+.directory-grid { gap: 16px; }
+.activity-card {
+  display: flex;
+  flex-direction: column;
+  padding: 22px 24px;
+  border-radius: 14px;
+}
+.activity-card-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+.activity-card-meta:empty { display: none; }
+.activity-card h3 { margin: 10px 0 14px; font-size: 24px; line-height: 1.45; }
+.activity-card-meta:empty + h3 { margin-top: 0; }
+.activity-card-actions { margin-top: auto; }
+.pending-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #fff;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+/* スマホ */
+@media (max-width: 700px) {
+  .eyebrow, .purpose-heading > span { font-size: 13px; }
+  .eyebrow::before, .purpose-heading > span::before { width: 16px; }
+  .page-heading { padding-bottom: 24px; margin-bottom: 24px; }
+  .page-heading h1 { font-size: clamp(28px, 8vw, 36px); }
+  .page-heading > p { font-size: 16px; }
+  .hero-content > .eyebrow { font-size: 13px; max-width: none; }
+  .hero-description { font-size: 15px; }
+  .hero-sub-link { font-size: 15px; }
+  .purpose-heading h2 { font-size: 24px; }
+  .purpose-links strong { font-size: 16px; }
+  .purpose-links small { font-size: 13px; }
+  .purpose-number { font-size: 12px; }
+  .planner-home-entry .eyebrow { font-size: 12px; }
+  .planner-home-entry p { font-size: 15px; }
+  .status-note p, .context-note p { font-size: 14px; }
+  .result-count { font-size: 14px; }
+  .small { font-size: 14px; }
+  .footer-links a { font-size: 15px; }
+  .footer-bottom { font-size: 13px; }
+  .site-footer .small { font-size: 13px; }
+  .directory-grid { grid-template-columns: 1fr; gap: 12px; }
+  .activity-card { padding: 16px 18px; border-radius: 12px; }
+  .activity-card h3 { margin: 6px 0 8px; font-size: 21px; }
+  .activity-card-actions .text-link { font-size: 16px; }
+}
+
+/* スマホの「目的から探す」は1列にして、文字の途中で折り返さない */
+@media (max-width: 700px) {
+  .purpose-links { grid-template-columns: 1fr; }
+  .purpose-links > a,
+  .purpose-links > a:nth-child(-n + 2) {
+    min-height: 0;
+    padding: 15px 16px;
+    align-items: center;
+    border-right: 0;
+    border-bottom: 1px solid #e0e6dd;
+  }
+  .purpose-links > a:last-child { border-bottom: 0; }
+  .purpose-links small { margin-top: 2px; }
+  .purpose-number { align-self: center; padding-top: 0; }
+  .purpose-links b { display: block; font-size: 18px; }
+}
+
+/* セクション番号ラベルを小見出しと同じ形にそろえる */
+.section-label { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--green); }
+.section-label::before { content: ""; flex-shrink: 0; width: 22px; height: 2px; border-radius: 2px; background: currentColor; }
+.section-label > span { border-left: 0; padding-left: 0; font-variant-numeric: tabular-nums; }
+.activity-entry p { font-size: 16px; }
+.activity-entry-actions .button { font-size: 16px; }
+@media (max-width: 700px) {
+  .section-label::before { width: 16px; }
+  .activity-entry-actions .button { font-size: 15px; }
+}
