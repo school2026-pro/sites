@@ -21,15 +21,23 @@
 
 | ファイル | 用途 |
 | --- | --- |
-| `index.html` | ヘッダー、メニュー、読み込み、フッター、ダイアログ |
-| `assets/style.css` | 字体・配色・レスポンシブ表示 |
-| `assets/app.js` | 画面描画、検索、ランキング、診断UI |
+| `index.html` | ヘッダー、メニュー、スマホ下部タブ、フッター、詳細・検索ダイアログ、読み込み |
+| `assets/site.css` | 学校案内のデザイン（1ファイルに統一）。色・字体は先頭の `:root` で変更 |
+| `assets/school-day.css` | 日課表・3D校内マップの見た目 |
+| `assets/app.js` | 画面描画、今日の日課、一覧・絞り込み、詳細（前後移動）、ランキング、診断UI |
+| `assets/search.js` | サイト内検索（ページ・部活・委員会・先生・日課・教室。ひらがなでも検索可） |
+| `assets/features.js` | 気になるリスト・おまかせ表示 |
 | `assets/quiz.js` | 診断の質問・分類・候補抽出 |
+| `assets/school-day.js` / `school-day-data.js` / `campus-3d.js` | 日課表・校内マップと、その公式資料に基づくデータ |
 | `assets/data.js` | 公開確認済みの掲載データ |
-| `assets/campus.svg` | オリジナルの学校生活イメージ（実際の校舎図ではない） |
-| `assets/mark.svg` | オリジナルの本をモチーフにしたアイコン |
+| `assets/campus-refined.svg` | オリジナルの学校生活イメージ（実際の校舎図ではない） |
+| `assets/mark.svg` | ロゴ（ノートと蛍光ペン）。マイ手帳でも使用 |
 
-フレームワーク・npm・APIキーは不要。字体はGoogle FontsのNoto Sans JPとZen Maru Gothicを利用し、取得できない場合はシステムフォントを使用します。
+フレームワーク・npm・APIキーは不要。字体はGoogle FontsのZen Kaku Gothic New（見出し）・Noto Sans JP（本文）・Klee One（手書き風の書き込み）を利用し、取得できない場合はシステムフォントを使用します。
+
+### デザインの考え方
+
+「生徒がつくる、学校の攻略ノート」。方眼のノート、蛍光ペンのマーカー、太い見出し、手書き風の書き込みで統一します。部活は緑、文化部は紫、委員会は藍、先生はコーラルで色分けします。本文とその背景のコントラストはWCAGの4.5:1以上を保ってください。
 
 ## 手元で確認する
 
@@ -41,6 +49,7 @@ python3 -m http.server 8000
 
 ```bash
 node --check assets/app.js
+node --check assets/search.js
 node --check assets/quiz.js
 node --check assets/data.js
 ```
