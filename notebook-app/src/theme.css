@@ -1,0 +1,189 @@
+/*
+ * マイ手帳 — 学校案内と共通のデザイン（攻略ノート）
+ * style.css / design.css / chat.css の上に重ねる最後の層。
+ * 色・字体は学校案内の assets/site.css と同じ値を使う。
+ */
+:root {
+  --green: #0f6b4f;
+  --green-deep: #0a4a37;
+  --dark: #15241d;
+  --ink: #15241d;
+  --muted: #47554d;
+  --line: #d9d5c6;
+  --paper: #ffffff;
+  --cream: #f7f5ee;
+  --pale: #e2efe7;
+  --gold: #b88a1b;
+  --marker: #ffd83d;
+  --marker-soft: #fff1a6;
+  --coral: #d9532f;
+  --display: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --body: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  --hand: "Klee One", "Hiragino Maru Gothic ProN", "Yu Gothic", cursive;
+  --grid-paper: linear-gradient(rgba(15, 107, 79, 0.07) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, rgba(15, 107, 79, 0.07) 1px, transparent 1px) 0 0 / 24px 24px;
+}
+
+/* ---------- 基本 ---------- */
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  word-break: auto-phrase;
+}
+textarea, input, .entry-open strong, .chat-message-feed p { word-break: normal; }
+h1, h2, h3 {
+  font-family: var(--display);
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  font-feature-settings: "palt";
+  text-wrap: balance;
+  color: var(--ink);
+}
+:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+::selection { background: var(--marker-soft); }
+.eyebrow {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--green);
+}
+.small-muted { color: var(--muted); }
+
+/* ---------- ボタン ---------- */
+.button {
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  font-family: var(--display);
+  font-weight: 700;
+  box-shadow: 3px 3px 0 var(--ink);
+  transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
+}
+.button:not(:disabled):hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.button:not(:disabled):active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.button.primary { background: var(--green); color: #fff; }
+.button.primary:not(:disabled):hover { background: var(--green-deep); }
+.button.secondary { background: #fff; color: var(--ink); }
+.button.secondary:not(:disabled):hover { background: var(--marker-soft); }
+.button:disabled { box-shadow: 3px 3px 0 #9aa69f; border-color: #9aa69f; }
+.text-button { color: var(--green); font-family: var(--display); font-weight: 700; }
+.danger-button { font-family: var(--display); font-weight: 700; }
+
+/* ---------- ヘッダー ---------- */
+.app-header {
+  background: color-mix(in srgb, var(--cream) 92%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 2px solid var(--ink);
+}
+.brand { color: var(--ink); font-family: var(--display); font-weight: 900; }
+img.brand-mark { width: 36px; height: 36px; flex: 0 0 36px; }
+.brand small { font-family: var(--hand); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; color: var(--muted); }
+.account > .button { box-shadow: 2px 2px 0 var(--ink); }
+
+/* ---------- 入口（ログイン前） ---------- */
+.landing { background: var(--grid-paper), var(--cream); }
+.landing h1 { font-weight: 900; line-height: 1.3; }
+.landing h1 em {
+  font-style: normal;
+  color: var(--green-deep);
+  background: linear-gradient(transparent 60%, var(--marker) 60%, var(--marker) 92%, transparent 92%);
+}
+.landing-card {
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: 6px 6px 0 var(--ink);
+  background: #fff;
+}
+.landing-features h2, .landing-features h3 { font-family: var(--display); }
+
+/* ---------- 左メニュー（スマホは下部タブ） ---------- */
+.sidebar { background: #fff; border-color: var(--line); }
+.sidebar nav button { font-family: var(--display); font-weight: 700; color: var(--ink); }
+.sidebar nav button:hover { background: var(--marker-soft); }
+.sidebar nav button.active { background: var(--ink); color: #fff; box-shadow: none; }
+.sidebar nav button.active svg { color: var(--marker); }
+.sidebar > .eyebrow { color: var(--muted); }
+
+/* ---------- 各画面 ---------- */
+.page-top h1 { font-weight: 900; }
+.demo-banner {
+  border: 1.5px dashed var(--ink);
+  border-radius: 12px;
+  background: var(--marker-soft);
+  color: var(--ink);
+}
+.demo-banner a, .demo-banner .text-button { color: var(--ink); text-decoration-color: var(--marker); }
+.panel, .date-toolbar {
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: none;
+}
+.day-summary {
+  border: 2px solid var(--ink);
+  border-radius: 16px;
+  background: var(--grid-paper), #fff;
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.day-summary > div > span { font-family: var(--display); font-weight: 700; color: var(--green); letter-spacing: 0.04em; }
+.day-summary h2 { font-weight: 900; }
+.progress-wrap strong { font-family: var(--display); font-weight: 900; }
+progress { accent-color: var(--green); }
+.reflection-invite, .reflection-invite.panel { background: var(--green); color: #fff; border-color: var(--ink); }
+.reflection-invite h2, .reflection-invite h3 { color: #fff; }
+.reflection-invite .eyebrow { color: var(--marker); }
+.reflection-invite a, .reflection-invite button.text-button { color: var(--marker); }
+.stat-grid > section { border: 2px solid var(--ink); border-radius: 14px; background: #fff; }
+.stat-grid strong { font-family: var(--display); font-weight: 900; }
+
+/* 入力欄 */
+input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+  border-color: #b9b4a3;
+  border-radius: 10px;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--ink); }
+
+/* 切り替えボタン */
+.segmented { border: 2px solid var(--ink); border-radius: 14px; background: #fff; padding: 4px; }
+.segmented > button { border-radius: 10px; font-family: var(--display); font-weight: 700; }
+.segmented > [aria-pressed="true"] { background: var(--ink); color: #fff; }
+
+/* 予定の行 */
+.entry-check { border-color: var(--ink); }
+.entry.is-done .entry-check { background: var(--green); border-color: var(--green); }
+.entry-open strong { font-family: var(--display); font-weight: 700; }
+.important { background: var(--marker); color: var(--ink); }
+.ratings button[aria-pressed="true"], .ratings .active { background: var(--ink); border-color: var(--ink); color: var(--marker); }
+
+/* 時間割・持ち物 */
+.school-save-bar, .save-bar { border: 2px solid var(--ink); border-radius: 14px; background: var(--marker-soft); }
+
+/* ダイアログ */
+.entry-dialog {
+  border: 2px solid var(--ink);
+  border-radius: 20px;
+  background: var(--cream);
+  box-shadow: 8px 8px 0 var(--ink);
+}
+.entry-dialog::backdrop { background: rgba(21, 36, 29, 0.55); }
+
+/* チャット */
+.chat-start, .chat-welcome { background: var(--grid-paper), #fff; }
+
+.workspace-footer a { color: var(--green); }
+
+/* ---------- スマホ ---------- */
+@media (max-width: 700px) {
+  .app-header { border-bottom-width: 2px; }
+  .sidebar { border-top: 2px solid var(--ink); background: #fff; box-shadow: none; }
+  .sidebar nav button.active { background: transparent; color: var(--ink); }
+  .sidebar nav button.active svg { color: var(--ink); background: var(--marker); border-radius: 8px; padding: 1px; }
+  .day-summary { box-shadow: 3px 3px 0 var(--ink); }
+  .entry-dialog { box-shadow: 0 -8px 30px rgba(21, 36, 29, 0.25); }
+}
+
+/* 緑のカード上の本文は明るい色に（背景とのコントラストを確保） */
+.reflection-invite p, .reflection-invite .small-muted { color: #e3f1ea; }
