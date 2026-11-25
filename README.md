@@ -6,6 +6,8 @@
 - リポジトリ：https://github.com/school2026-pro/sites
 - GitHub Pages：`main` のルートから公開。ビルド不要。
 
+# https://github.com/school2026-pro/sites/wiki/%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AA%E3%81%A9
+
 ## 改善点
 -
 -
