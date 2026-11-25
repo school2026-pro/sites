@@ -168,9 +168,8 @@ function home() {
             <a class="button button-ghost" href="#clubs/quiz">部活診断をはじめる</a>
           </div>
         </div>
-        <figure class="hero-figure">
-          <img src="assets/campus-refined.svg" width="640" height="230" alt="校舎と木々を描いたイラスト">
-          <figcaption class="hand-note">生徒がつくる、<br>学校の攻略ノート。</figcaption>
+        <figure class="hero-figure hero-character">
+          <img src="assets/hero-character.webp" width="256" height="192" alt="学校は楽しいよ！と笑顔で手を差し伸べる生徒">
         </figure>
       </div>
     </section>
