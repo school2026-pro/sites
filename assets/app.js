@@ -199,7 +199,7 @@ function home() {
             .join('')}
         </ul>
       </div>
-      ${statusNote('アンケート集計準備中。先生の紹介や生徒の声は、確認後に順次掲載します。')}
+      ${statusNote('アンケート集計準備中。先生の紹介や生徒の声は、確認後に順次掲載します。。。。。。。。。。')}
     </section>
 
     <section class="band" aria-labelledby="activities-title">
