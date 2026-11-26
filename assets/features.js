@@ -1,4 +1,4 @@
-/* 探す楽しさを加える、小さな機能。アンケートの原票や診断回答は保存しません。 */
+/* 探す楽しさを加える、小さな機能☺️。アンケートの原票や診断回答は保存しません。 */
 'use strict';
 window.GuidePlay = (() => {
   const data = window.SCHOOL_DATA;
